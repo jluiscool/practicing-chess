@@ -1,7 +1,7 @@
 .square {
     width: 12.5%;
     height: 12.5%;
-    
+    border: 1px solid black;
 
     &__container {
         width: 100%;
@@ -9,11 +9,18 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        border: 1px solid black;
     }
 
     &__img {
         width: 85%;
         height: auto;
     }
+}
+
+.beige {
+    background-color: rgb(110, 110, 98);
+}
+
+.brown {
+    background-color: rgb(169, 43, 43);
 }

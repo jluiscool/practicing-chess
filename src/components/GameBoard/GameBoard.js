@@ -18,6 +18,10 @@ import Square from '../Square/Square';
 
 function GameBoard() {
 
+    const [player, setPlayer] = useState('Player 1')
+
+    const [selectedPiece, setSelectedPiece] = useState(false)
+
     const [board, setBoard] = useState(
         [
             BlkRook, BlkKnight, BlkBishop, BlkQueen, BlkKing, BlkBishop, BlkKnight, BlkRook,
@@ -31,14 +35,32 @@ function GameBoard() {
         ]
     )
 
-    const [player, setPlayer] = useState('Player 1')
+    function changeColor(index) {
+        let color = '';
+        if ((index >= 0 && index < 8) || (index >= 16 && index < 24) || (index >= 32 && index < 40) || (index >= 48 && index < 56)) {
+            if (index % 2) {
+                color = 'beige'
+            } else {
+                color = 'brown'
+            }
+        }
+        if ((index >= 8 && index < 16) || (index >= 24 && index < 32) || (index >= 40 && index < 48) || (index >= 56 && index < 64)) {
+            index = index + 1;
+            if (index % 2) {
+                color = 'beige'
+            } else {
+                color = 'brown'
+            }
+        }
+        return color;
+    }
 
     return (
         <div className='gameboard'>
             {
                 board.map((square, index) => {
                     return (
-                        <Square key={index} id={index} piece={square ? square : ''}/>
+                        <Square key={index} id={index} piece={square ? square : ''} backgroundColor={changeColor(index)}/>
                     )
                 })
             }
