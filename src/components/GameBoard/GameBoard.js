@@ -1,37 +1,83 @@
 import './GameBoard.scss'
-
-import BlkKing from '../../assets/Blk_King.svg';
-import BlkBishop from '../../assets/Blk_Bishop.svg';
-import BlkQueen from '../../assets/Blk_Queen.svg';
-import BlkRook from '../../assets/Blk_Rook.svg';
-import BlkKnight from '../../assets/Blk_Knight.svg';
-import BlkPawn from '../../assets/Blk_Pawn.svg';
-
-import WhtKing from '../../assets/Wht_King.svg';
-import WhtBishop from '../../assets/Wht_Bishop.svg';
-import WhtQueen from '../../assets/Wht_Queen.svg';
-import WhtRook from '../../assets/Wht_Rook.svg';
-import WhtKnight from '../../assets/Wht_Knight.svg';
-import WhtPawn from '../../assets/Wht_Pawn.svg';
 import { useState } from 'react';
 import Square from '../Square/Square';
 
 function GameBoard() {
 
-    const [player, setPlayer] = useState('Player 1')
+    const [player, setPlayer] = useState('White')
 
-    const [selectedPiece, setSelectedPiece] = useState(false)
+    const [isPieceSelected, setIsPieceSelected] = useState(false)
+
+    const BlackRook = {
+        player: 'black',
+        piece: 'Rook'
+    };
+
+    const BlackBishop = {
+        player: 'black',
+        piece: 'Bishop'
+    };
+
+    const BlackKnight = {
+        player: 'black',
+        piece: 'Knight'
+    };
+
+    const BlackQueen = {
+        player: 'black',
+        piece: 'Queen'
+    };
+
+    const BlackKing = {
+        player: 'black',
+        piece: 'King'
+    };
+
+    const BlackPawn = {
+        player: 'black',
+        piece: 'Pawn'
+    };
+
+    const WhiteRook = {
+        player: 'white',
+        piece: 'Rook'
+    };
+
+    const WhiteBishop = {
+        player: 'white',
+        piece: 'Bishop'
+    };
+
+    const WhiteKnight = {
+        player: 'white',
+        piece: 'Knight'
+    };
+
+    const WhiteQueen = {
+        player: 'white',
+        piece: 'Queen'
+    };
+
+    const WhiteKing = {
+        player: 'white',
+        piece: 'King'
+    };
+
+    const WhitePawn = {
+        player: 'white',
+        piece: 'Pawn'
+    };
 
     const [board, setBoard] = useState(
         [
-            BlkRook, BlkKnight, BlkBishop, BlkQueen, BlkKing, BlkBishop, BlkKnight, BlkRook,
-            BlkPawn, BlkPawn, BlkPawn, BlkPawn, BlkPawn, BlkPawn, BlkPawn, BlkPawn,
+            BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, BlackBishop, BlackKnight, BlackRook,
+            BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn,
             '', '', '', '', '', '', '', '',
             '', '', '', '', '', '', '', '',
             '', '', '', '', '', '', '', '',
             '', '', '', '', '', '', '', '',
-            WhtPawn, WhtPawn, WhtPawn, WhtPawn, WhtPawn, WhtPawn, WhtPawn, WhtPawn,
-            WhtRook, WhtKnight, WhtBishop, WhtQueen, WhtKing, WhtBishop, WhtKnight, WhtRook
+            WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn,
+            WhiteRook, WhiteKnight, WhiteBishop, WhiteQueen, WhiteKing, WhiteBishop, WhiteKnight, WhiteRook
         ]
     )
 
@@ -55,17 +101,23 @@ function GameBoard() {
         return color;
     }
 
-    function handleOnClick(id) {
-        setSelectedPiece(prev => !prev)
-        console.log(`you clicked on square: ${id}`)
-    }
+    // function handleSquareClick(id) {
+    //     console.log(`you clicked on square: ${id}`)
+    // }
 
     return (
         <div className='gameboard'>
             {
                 board.map((square, index) => {
                     return (
-                        <Square key={index} id={index} piece={square ? square : ''} backgroundColor={changeColor(index)} handleOnClick={handleOnClick}/>
+                        <Square
+                            key={index}
+                            id={index}
+                            piece={square ? square : ''}
+                            backgroundColor={changeColor(index)}
+                            // onClick={handleSquareClick}
+                            // isPieceSelected={isPieceSelected}
+                        />
                     )
                 })
             }

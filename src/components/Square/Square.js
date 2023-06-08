@@ -1,19 +1,42 @@
 import { useState } from 'react';
 import './Square.scss'
+import Bishop from '../Pieces/Bishop';
+import Rook from '../Pieces/Rook';
+import Pawn from '../Pieces/Pawn';
+import Knight from '../Pieces/Knight';
+import Queen from '../Pieces/Queen';
+import King from '../Pieces/King';
 
-function Square({ piece, backgroundColor, handleOnClick, id, }) {
+function Square({ piece, backgroundColor, id, isSelected }) {
 
     const [selected, setSelected] = useState(false)
 
-    function handleBeingClicked(id) {
-        handleOnClick(id)
-        setSelected(prev => !prev)
+    function renderComponent(component, player) {
+        if (component === 'King') {
+            return <King playerColor={player} /* isSelected={isSelected} *//>
+        }
+        if (component === 'Queen') {
+            return <Queen playerColor={player} /* isSelected={isSelected} *//>
+        }
+        if (component === 'Rook') {
+            return <Rook playerColor={player} /* isSelected={isSelected} *//>
+        }
+        if (component === 'Bishop') {
+            return <Bishop playerColor={player} /* isSelected={isSelected} *//>
+        }
+        if (component === 'Knight') {
+            return <Knight playerColor={player} /* isSelected={isSelected} *//>
+        }
+        if (component === 'Pawn') {
+            return <Pawn playerColor={player} /* isSelected={isSelected} *//>
+        }
     }
+
     
     return (
-        <div className={`square ${backgroundColor}`} onClick={() => handleBeingClicked(id)}>
+        <div className={`square ${backgroundColor}`} >
             <div className={selected ? 'square__container highlighted' : 'square__container'} >
-                {piece ? <img className="square__img" src={piece} /> : ""}
+                {piece ? renderComponent(piece.piece, piece.player) : ""}
             </div>
         </div>
     )
