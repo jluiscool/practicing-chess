@@ -11,6 +11,10 @@
         align-items: center;
     }
 
+    .highlighted {
+        background-color: yellow;
+    }
+
     &__img {
         width: 85%;
         height: auto;

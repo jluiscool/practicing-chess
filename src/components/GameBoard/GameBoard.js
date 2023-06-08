@@ -55,12 +55,17 @@ function GameBoard() {
         return color;
     }
 
+    function handleOnClick(id) {
+        setSelectedPiece(prev => !prev)
+        console.log(`you clicked on square: ${id}`)
+    }
+
     return (
         <div className='gameboard'>
             {
                 board.map((square, index) => {
                     return (
-                        <Square key={index} id={index} piece={square ? square : ''} backgroundColor={changeColor(index)}/>
+                        <Square key={index} id={index} piece={square ? square : ''} backgroundColor={changeColor(index)} handleOnClick={handleOnClick}/>
                     )
                 })
             }
