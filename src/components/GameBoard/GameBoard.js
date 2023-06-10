@@ -1,12 +1,12 @@
 import './GameBoard.scss'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Square from '../Square/Square';
 
 function GameBoard() {
 
     const [player, setPlayer] = useState('White')
 
-    const [isPieceSelected, setIsPieceSelected] = useState(false)
+    const [selectedPiece, setSelectedPiece] = useState(0)
 
     const BlackRook = {
         player: 'black',
@@ -101,9 +101,14 @@ function GameBoard() {
         return color;
     }
 
-    // function handleSquareClick(id) {
-    //     console.log(`you clicked on square: ${id}`)
-    // }
+    function resetSelect(index) {
+        setSelectedPiece(index)
+        console.log(`Is square ${index} selected?`)
+    }
+
+    useEffect(() => {
+        console.log(selectedPiece)
+    }, [selectedPiece])
 
     return (
         <div className='gameboard'>
@@ -115,8 +120,7 @@ function GameBoard() {
                             id={index}
                             piece={square ? square : ''}
                             backgroundColor={changeColor(index)}
-                            // onClick={handleSquareClick}
-                            // isPieceSelected={isPieceSelected}
+                            resetSelect={resetSelect}
                         />
                     )
                 })

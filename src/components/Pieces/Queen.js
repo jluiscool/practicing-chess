@@ -4,7 +4,7 @@ import WhiteQueen from '../../assets/Wht_Queen.svg'
 function Queen({playerColor}) {
     return (
         <div className="queen">
-            <img src={playerColor === 'white' ? WhiteQueen : BlackQueen} />
+            <img src={playerColor === 'white' ? WhiteQueen : BlackQueen} alt="queen"/>
         </div>
     )
 }

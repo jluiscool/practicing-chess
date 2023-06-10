@@ -4,7 +4,7 @@ import WhiteKing from '../../assets/Wht_King.svg'
 function King({playerColor}) {
     return (
         <div className="king">
-            <img src={playerColor === 'white' ? WhiteKing : BlackKing} />
+            <img src={playerColor === 'white' ? WhiteKing : BlackKing} alt="king"/>
         </div>
     )
 }

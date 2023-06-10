@@ -4,7 +4,7 @@ import WhiteKnight from '../../assets/Wht_Knight.svg'
 function Knight({playerColor}) {
     return (
         <div className="knight">
-            <img src={playerColor === 'white' ? WhiteKnight : BlackKnight} />
+            <img src={playerColor === 'white' ? WhiteKnight : BlackKnight} alt="knight"/>
         </div>
     )
 }
