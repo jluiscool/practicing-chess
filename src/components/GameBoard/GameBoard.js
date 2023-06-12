@@ -4,14 +4,13 @@ import Square from '../Square/Square';
 
 function GameBoard() {
 
-    const [player, setPlayer] = useState('white');
+    const [playerTurn, setPlayerTurn] = useState('white');
 
     const [selectedPiece, setSelectedPiece] = useState(null);
 
     const [possibleMoves, setPossibleMoves] = useState([]);
 
     const ranks = 8;
-
     const files = 8;
 
     const BlackRook = {
@@ -161,24 +160,26 @@ function GameBoard() {
     }
 
     function movePiece(squareToMove) {
-        let isItTrue;
+        let validSquare;
         if (selectedPiece && possibleMoves.length > 0) {
-            console.log('Piece is ready to move')
             for (let i = 0; i < possibleMoves.length; i++) {
                 if (squareToMove === possibleMoves[i])
-                    isItTrue = possibleMoves[i]
+                    validSquare = possibleMoves[i]
             }
-            console.log(isItTrue)
+            console.log(validSquare)
         } else {
             return;
         }
-        if (isItTrue) {
-            console.log('You can move to this square')
+        if (validSquare && playerTurn === board[selectedPiece].player) {
+            console.log(`You can move to this square ${validSquare}`)
             setBoard((prev) => {
-                let newBoard = prev.map((square) => {
-                    if (square === isItTrue) {
+                let newBoard = prev.map((square, index) => {
+                    if (index === validSquare) {
                         console.log('Lets go!!!')
                         square = board[selectedPiece];
+                        return square;
+                    } else if (index === selectedPiece) {
+                        square = "";
                         return square;
                     } else {
                         console.log('function not working')
@@ -211,6 +212,10 @@ function GameBoard() {
             console.log(possibleMoves)
         }
     }, [possibleMoves])
+
+    useEffect(() => {
+        console.log(board)
+    }, [board])
 
     return (
         <div className='gameboard'>
