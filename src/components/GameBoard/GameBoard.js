@@ -4,68 +4,69 @@ import Square from '../Square/Square';
 
 function GameBoard() {
 
-    const [player, setPlayer] = useState('White')
+    const [player, setPlayer] = useState('white')
 
-    const [selectedPiece, setSelectedPiece] = useState(0)
+    const [selectedPiece, setSelectedPiece] = useState(null)
 
     const BlackRook = {
         player: 'black',
-        piece: 'Rook'
+        piece: 'Rook',
+        isSelected: false,
     };
-
     const BlackBishop = {
         player: 'black',
-        piece: 'Bishop'
+        piece: 'Bishop',
+        isSelected: false,
     };
-
     const BlackKnight = {
         player: 'black',
-        piece: 'Knight'
+        piece: 'Knight',
+        isSelected: false,
     };
-
     const BlackQueen = {
         player: 'black',
-        piece: 'Queen'
+        piece: 'Queen',
+        isSelected: false,
     };
-
     const BlackKing = {
         player: 'black',
-        piece: 'King'
+        piece: 'King',
+        isSelected: false,
     };
-
     const BlackPawn = {
         player: 'black',
-        piece: 'Pawn'
+        piece: 'Pawn',
+        isSelected: false,
     };
-
     const WhiteRook = {
         player: 'white',
-        piece: 'Rook'
+        piece: 'Rook',
+        isSelected: false,
     };
-
     const WhiteBishop = {
         player: 'white',
-        piece: 'Bishop'
+        piece: 'Bishop',
+        isSelected: false,
     };
-
     const WhiteKnight = {
         player: 'white',
-        piece: 'Knight'
+        piece: 'Knight',
+        isSelected: false,
     };
-
     const WhiteQueen = {
         player: 'white',
-        piece: 'Queen'
+        piece: 'Queen',
+        isSelected: false,
     };
-
     const WhiteKing = {
         player: 'white',
-        piece: 'King'
+        piece: 'King',
+        isSelected: false,
     };
-
     const WhitePawn = {
         player: 'white',
-        piece: 'Pawn'
+        piece: 'Pawn',
+        isSelected: false,
     };
 
     const [board, setBoard] = useState(
@@ -101,14 +102,31 @@ function GameBoard() {
         return color;
     }
 
-    function resetSelect(index) {
-        setSelectedPiece(index)
-        console.log(`Is square ${index} selected?`)
+    function selectAPiece(index) {
+        if (index === selectedPiece) {
+            setSelectedPiece(null)
+        } else {
+            setSelectedPiece(index)
+        }
     }
 
-    useEffect(() => {
-        console.log(selectedPiece)
-    }, [selectedPiece])
+    function pawnMoves(piece, index) {
+        const arr = [];
+        if (piece.player === 'white') {
+            arr.push(index + 8);
+        } else if (piece.player === 'black') {
+            arr.push(index - 8);
+        }
+        return arr;
+    }
+
+    function possibleMoves(array) {
+        board.map((square) => {
+            for (let i=0; i < array.length; i++) {
+                console.log('This square is a possible move');
+            }
+        })
+    }
 
     return (
         <div className='gameboard'>
@@ -120,7 +138,9 @@ function GameBoard() {
                             id={index}
                             piece={square ? square : ''}
                             backgroundColor={changeColor(index)}
-                            resetSelect={resetSelect}
+                            selectAPiece={selectAPiece}
+                            selectedPiece={selectedPiece === index ? true : false}
+                            possibleMoves={() => possibleMoves(pawnMoves(square, index))}
                         />
                     )
                 })

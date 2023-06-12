@@ -7,9 +7,9 @@ import Knight from '../Pieces/Knight';
 import Queen from '../Pieces/Queen';
 import King from '../Pieces/King';
 
-function Square({ piece, backgroundColor, id, resetSelect }) {
+function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, }) {
 
-    const [selected, setSelected] = useState(false)
+    const selected = selectedPiece;
 
     function renderComponent(component, player) {
         if (component === 'King') {
@@ -32,20 +32,17 @@ function Square({ piece, backgroundColor, id, resetSelect }) {
         }
     }
 
-    function handleOnClick(id) {
-        console.log(`You clicked on square: ${id}`)
-        setSelected(prev => !prev)
-    }
-
-    useEffect(() => {
-        if (selected) {
-            resetSelect(id);
+    function handleOnClick(e) {
+        if (e.target.hasChildNodes()) {
+            selectAPiece(id)
+        } else {
+            return;
         }
-    }, [id, selected, resetSelect]);
+    }
 
     return (
         <div className={`square ${backgroundColor}`} >
-            <div className={selected ? 'square__container highlighted' : 'square__container'} onClick={() => handleOnClick(id)}>
+            <div className={selected ? 'square__container highlighted' : 'square__container'} onClick={(e) => handleOnClick(e)}>
                 {piece ? renderComponent(piece.piece, piece.player) : ""}
             </div>
         </div>

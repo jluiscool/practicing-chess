@@ -1,5 +1,7 @@
-import BlackRook from '../../assets/Blk_Rook.svg'
-import WhiteRook from '../../assets/Wht_Rook.svg'
+import BlackRook from '../../assets/Blk_Rook.svg';
+import WhiteRook from '../../assets/Wht_Rook.svg';
+
+import './Rook.scss'
 
 function Rook({ playerColor }) {
     return (
