@@ -59,7 +59,6 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
     }
 
     function handleOnClick(e) {
-        console.log(id)
         if (e.target.hasChildNodes()) {
             selectAPiece(id)
         }

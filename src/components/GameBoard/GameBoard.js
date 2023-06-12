@@ -116,21 +116,36 @@ function GameBoard() {
     }
 
     function pawnMoves(piece, index) {
+        console.log(index)
         const arr = [];
         if (piece.player === 'white') {
-            if (6 <= index / ranks && index / ranks < 7) {
+            if (6 <= index / ranks && index / ranks < 7 && board[index - 8] == false) {
                 arr.push(index - 8);
-                arr.push(index - 16);
-            } else {
+                if (board[index - 16] == false) {
+                    arr.push(index - 16);
+                }
+            }
+            if (index / ranks < 6 && board[index - 8] == false) {
                 arr.push(index - 8);
             }
         }
         if (piece.player === 'black') {
-            if (1 <= index / ranks && index / ranks < 2) {
+            if (1 <= index / ranks && index / ranks < 2 && board[index + 8] == false) {
                 arr.push(index + 8);
-                arr.push(index + 16);
-            } else {
+                if (board[index + 16] == false)
+                    arr.push(index + 16);
+            }
+            if (index / ranks > 2 && board[index + 8] == false) {
                 arr.push(index + 8);
+            }
+            if (board[index + 7] == true) {
+                arr.push(index + 7);
+            }
+            if (board[index + 9] == true) {
+                arr.push(index + 9);
+            }
+            else {
+                console.log('wtf')
             }
         }
         return arr;
@@ -175,17 +190,20 @@ function GameBoard() {
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
                     if (index === validSquare) {
-                        console.log('Lets go!!!')
                         square = board[selectedPiece];
                         return square;
                     } else if (index === selectedPiece) {
                         square = "";
                         return square;
                     } else {
-                        console.log('function not working')
                         return square;
                     }
                 })
+                if (playerTurn === 'white') {
+                    setPlayerTurn('black')
+                } else {
+                    setPlayerTurn('white')
+                }
                 return newBoard;
             })
         } else {
@@ -195,7 +213,6 @@ function GameBoard() {
 
     useEffect(() => {
         if (selectedPiece) {
-            console.log(selectedPiece)
             if (board[selectedPiece].piece === 'Pawn') {
                 findPossibleMoves(pawnMoves(board[selectedPiece], selectedPiece))
             }
@@ -207,15 +224,15 @@ function GameBoard() {
         }
     }, [selectedPiece])
 
-    useEffect(() => {
-        if (possibleMoves.length < 0) {
-            console.log(possibleMoves)
-        }
-    }, [possibleMoves])
+    // useEffect(() => {
+    //     if (possibleMoves.length < 0) {
+    //         console.log(possibleMoves)
+    //     }
+    // }, [possibleMoves])
 
-    useEffect(() => {
-        console.log(board)
-    }, [board])
+    // useEffect(() => {
+    //     console.log(board)
+    // }, [board])
 
     return (
         <div className='gameboard'>
@@ -235,6 +252,7 @@ function GameBoard() {
                     )
                 })
             }
+            <div>It is {playerTurn}'s turn</div>
         </div>
     )
 }
