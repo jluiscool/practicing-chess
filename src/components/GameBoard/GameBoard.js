@@ -4,9 +4,15 @@ import Square from '../Square/Square';
 
 function GameBoard() {
 
-    const [player, setPlayer] = useState('white')
+    const [player, setPlayer] = useState('white');
 
-    const [selectedPiece, setSelectedPiece] = useState(null)
+    const [selectedPiece, setSelectedPiece] = useState(null);
+
+    const [possibleMoves, setPossibleMoves] = useState([]);
+
+    const ranks = 8;
+
+    const files = 8;
 
     const BlackRook = {
         player: 'black',
@@ -113,20 +119,98 @@ function GameBoard() {
     function pawnMoves(piece, index) {
         const arr = [];
         if (piece.player === 'white') {
-            arr.push(index + 8);
-        } else if (piece.player === 'black') {
-            arr.push(index - 8);
+            if (6 <= index / ranks && index / ranks < 7) {
+                arr.push(index - 8);
+                arr.push(index - 16);
+            } else {
+                arr.push(index - 8);
+            }
+        }
+        if (piece.player === 'black') {
+            if (1 <= index / ranks && index / ranks < 2) {
+                arr.push(index + 8);
+                arr.push(index + 16);
+            } else {
+                arr.push(index + 8);
+            }
         }
         return arr;
     }
 
-    function possibleMoves(array) {
-        board.map((square) => {
-            for (let i=0; i < array.length; i++) {
-                console.log('This square is a possible move');
-            }
-        })
+    function bishopMoves(piece, index) {
+        const arr = [];
+        if (piece.player === 'white') {
+            arr.push(index - 7);
+            arr.push(index - 9);
+            arr.push(index - 14);
+            arr.push(index - 18);
+            arr.push(index - 21);
+            arr.push(index - 27);
+        } else if (piece.player === 'black') {
+            arr.push(index + 7);
+            arr.push(index + 9);
+            arr.push(index + 14);
+            arr.push(index + 18);
+        }
+        return arr;
     }
+
+    function findPossibleMoves(array) {
+        console.log(`These square indexes: ${array} - are possible moves`);
+        setPossibleMoves(array)
+    }
+
+    function movePiece(squareToMove) {
+        let isItTrue;
+        if (selectedPiece && possibleMoves.length > 0) {
+            console.log('Piece is ready to move')
+            for (let i = 0; i < possibleMoves.length; i++) {
+                if (squareToMove === possibleMoves[i])
+                    isItTrue = possibleMoves[i]
+            }
+            console.log(isItTrue)
+        } else {
+            return;
+        }
+        if (isItTrue) {
+            console.log('You can move to this square')
+            setBoard((prev) => {
+                let newBoard = prev.map((square) => {
+                    if (square === isItTrue) {
+                        console.log('Lets go!!!')
+                        square = board[selectedPiece];
+                        return square;
+                    } else {
+                        console.log('function not working')
+                        return square;
+                    }
+                })
+                return newBoard;
+            })
+        } else {
+            console.log('You cant move to this square')
+        }
+    }
+
+    useEffect(() => {
+        if (selectedPiece) {
+            console.log(selectedPiece)
+            if (board[selectedPiece].piece === 'Pawn') {
+                findPossibleMoves(pawnMoves(board[selectedPiece], selectedPiece))
+            }
+            if (board[selectedPiece].piece === 'Bishop') {
+                findPossibleMoves(bishopMoves(board[selectedPiece], selectedPiece))
+            }
+        } else {
+            setPossibleMoves([])
+        }
+    }, [selectedPiece])
+
+    useEffect(() => {
+        if (possibleMoves.length < 0) {
+            console.log(possibleMoves)
+        }
+    }, [possibleMoves])
 
     return (
         <div className='gameboard'>
@@ -140,7 +224,8 @@ function GameBoard() {
                             backgroundColor={changeColor(index)}
                             selectAPiece={selectAPiece}
                             selectedPiece={selectedPiece === index ? true : false}
-                            possibleMoves={() => possibleMoves(pawnMoves(square, index))}
+                            possibleMoves={possibleMoves}
+                            movePiece={movePiece}
                         />
                     )
                 })

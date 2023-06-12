@@ -7,9 +7,35 @@ import Knight from '../Pieces/Knight';
 import Queen from '../Pieces/Queen';
 import King from '../Pieces/King';
 
-function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, }) {
+function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possibleMoves, movePiece }) {
 
     const selected = selectedPiece;
+
+    let amIAValidMove = validMove();
+
+    function addClassNames() {
+        let classname = "square__container";
+        if (selected) {
+            classname += " highlighted"
+        }
+        if (amIAValidMove) {
+            classname += " possible-move"
+        }
+        return classname;
+    }
+
+    function validMove() {
+        for (let i = 0; i < possibleMoves.length; i++) {
+            if (possibleMoves[i] === id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    useEffect(() => {
+        validMove()
+    }, [possibleMoves])
 
     function renderComponent(component, player) {
         if (component === 'King') {
@@ -33,16 +59,16 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, }) {
     }
 
     function handleOnClick(e) {
+        console.log(id)
         if (e.target.hasChildNodes()) {
             selectAPiece(id)
-        } else {
-            return;
         }
+        movePiece(id)
     }
 
     return (
         <div className={`square ${backgroundColor}`} >
-            <div className={selected ? 'square__container highlighted' : 'square__container'} onClick={(e) => handleOnClick(e)}>
+            <div className={addClassNames()} onClick={(e) => handleOnClick(e)}>
                 {piece ? renderComponent(piece.piece, piece.player) : ""}
             </div>
         </div>
