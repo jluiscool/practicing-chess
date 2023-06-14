@@ -120,6 +120,13 @@ function GameBoard() {
         return rank;
     }
 
+    function findSquareFile(index) {
+        let file = Math.trunc((index / files));
+        return file;
+    }
+
+    console.log(checkOneRankDiff(16, 9))
+
     function pawnMoves(piece, index) {
         const possibleMovesArr = [];
         //capture pieces
@@ -159,107 +166,132 @@ function GameBoard() {
         return possibleMovesArr;
     }
 
+    function checkOneRankDiff(newSquare, prevSquare) {
+        let diff = Math.abs(findSquareRank(newSquare) - findSquareRank(prevSquare))
+        if (diff === 1 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function checkValidBishopSquare(newSquare, prevSquare, currSquare) {
+        if (
+            /* findSquareRank(newSquare) !== findSquareRank(prevSquare) && */
+            checkOneRankDiff(newSquare, prevSquare) 
+            /* findSquareRank(newSquare) !== findSquareRank(currSquare) &&
+            findSquareRank(newSquare) >= 0 &&
+            findSquareRank(newSquare) < 64 */
+        ) {
+            // console.log('should be working')
+            return true;
+        } else {
+            // console.log('its breaking')
+            return false;
+        }
+    }
+
     function bishopMoves(piece, square) {
         const firstDiagonal = [7, 14, 21, 28, 35, 42, 49];
         const secondDiagonal = [9, 18, 27, 36, 45, 54, 63];
         const currentPlayer = piece.player;
+        const directions = 4;
         const movesArr = [];
-        if (currentPlayer === 'white') {
-            //right-up diagonal moves
-            for (let i = 0; i < firstDiagonal.length; i++) {
-                let diaSquare = firstDiagonal[i];
-                let prevDiaSquare = firstDiagonal[i - 1];
-                let newSquare = square - diaSquare;
-                let prevSquare = square - prevDiaSquare;
 
-                function checkValidBishopSquare() {
-                    if (findSquareRank(newSquare) !== findSquareRank(prevSquare) && findSquareRank(newSquare) !== findSquareRank(square)) {
-                        return true;
+        for (let i = 0; i < directions; i++) {
+            if (i === 0) {
+                for (let j = 0; j < firstDiagonal.length; j++) {
+                    let diaSquare = firstDiagonal[j];
+                    let prevDiaSquare = firstDiagonal[j - 1];
+                    let newFirstDiaSquareUp = square - diaSquare;
+                    let prevFirstDiaSquareUp = square - prevDiaSquare;
+
+                    if (checkValidBishopSquare(newFirstDiaSquareUp, prevFirstDiaSquareUp, square)) {
+                        if (board[newFirstDiaSquareUp]) {
+                            if (board[newFirstDiaSquareUp].player === currentPlayer) {
+                                break;
+                            }
+                            if (board[newFirstDiaSquareUp].player !== currentPlayer) {
+                                movesArr.push(newFirstDiaSquareUp);
+                                break;
+                            }
+                        } else if (!board[newFirstDiaSquareUp]) {
+                            movesArr.push(newFirstDiaSquareUp);
+                        }
                     } else {
-                        return false;
+                        break;
                     }
                 }
+            } else if (i === 1) {
+                for (let j = 0; j < firstDiagonal.length; j++) {
+                    let diaSquare = firstDiagonal[j];
+                    let prevDiaSquare = firstDiagonal[j + 1];
+                    let newFirstDiaSquareUp = square + diaSquare;
+                    let prevFirstDiaSquareUp = square + prevDiaSquare;
 
-                if (checkValidBishopSquare()) {
-                    if (board[newSquare]) {
-                        if (board[newSquare].player === currentPlayer) {
-                            break;
+                    if (checkValidBishopSquare(newFirstDiaSquareUp, prevFirstDiaSquareUp, square)) {
+                        if (board[newFirstDiaSquareUp]) {
+                            if (board[newFirstDiaSquareUp].player === currentPlayer) {
+                                break;
+                            }
+                            if (board[newFirstDiaSquareUp].player !== currentPlayer) {
+                                movesArr.push(newFirstDiaSquareUp);
+                                break;
+                            }
+                        } else if (!board[newFirstDiaSquareUp]) {
+                            movesArr.push(newFirstDiaSquareUp);
                         }
-                        if (board[newSquare].player !== currentPlayer) {
-                            movesArr.push(newSquare);
-                            break;
-                        }
-                    } else if (!board[newSquare]) {
-                        movesArr.push(newSquare);
+                    } else {
+                        break;
                     }
-                } else {
-                    break;
+                }
+            } else if (i === 2) {
+                for (let j = 0; j < secondDiagonal.length; j++) {
+                    let diaSquare = secondDiagonal[j];
+                    let prevDiaSquare = secondDiagonal[j - 1];
+                    let newFirstDiaSquareUp = square - diaSquare;
+                    let prevFirstDiaSquareUp = square - prevDiaSquare;
+
+                    if (checkValidBishopSquare(newFirstDiaSquareUp, prevFirstDiaSquareUp, square)) {
+                        if (board[newFirstDiaSquareUp]) {
+                            if (board[newFirstDiaSquareUp].player === currentPlayer) {
+                                break;
+                            }
+                            if (board[newFirstDiaSquareUp].player !== currentPlayer) {
+                                movesArr.push(newFirstDiaSquareUp);
+                                break;
+                            }
+                        } else if (!board[newFirstDiaSquareUp]) {
+                            movesArr.push(newFirstDiaSquareUp);
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            } else if (i === 3) {
+                for (let j = 0; j < secondDiagonal.length; j++) {
+                    let diaSquare = secondDiagonal[j];
+                    let prevDiaSquare = secondDiagonal[j + 1];
+                    let newFirstDiaSquareUp = square + diaSquare;
+                    let prevFirstDiaSquareUp = square + prevDiaSquare;
+
+                    if (checkValidBishopSquare(newFirstDiaSquareUp, prevFirstDiaSquareUp, square)) {
+                        if (board[newFirstDiaSquareUp]) {
+                            if (board[newFirstDiaSquareUp].player === currentPlayer) {
+                                break;
+                            }
+                            if (board[newFirstDiaSquareUp].player !== currentPlayer) {
+                                movesArr.push(newFirstDiaSquareUp);
+                                break;
+                            }
+                        } else if (!board[newFirstDiaSquareUp]) {
+                            movesArr.push(newFirstDiaSquareUp);
+                        }
+                    } else {
+                        break;
+                    }
                 }
             }
-
-            //left-down diagonal moves
-            for (let i = firstDiagonal.length; i >= 0; i--) {
-                let diaSquare = firstDiagonal[i];
-                let prevDiaSquare = firstDiagonal[i + 1];
-                let newSquare = square - diaSquare;
-                let prevSquare = square - prevDiaSquare;
-
-                function checkValidBishopSquare() {
-                    if (findSquareRank(newSquare) !== findSquareRank(prevSquare) && findSquareRank(newSquare) !== findSquareRank(square)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-
-                if (checkValidBishopSquare()) {
-                    if (board[newSquare]) {
-                        if (board[newSquare].player === currentPlayer) {
-                            break;
-                        }
-                        if (board[newSquare].player !== currentPlayer) {
-                            movesArr.push(newSquare);
-                            break;
-                        }
-                    } else if (!board[newSquare]) {
-                        movesArr.push(newSquare);
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            //left diagonal moves
-            // for (let i = 0; i < secondDiagonal.length; i++) {
-            //     let diaSquare = secondDiagonal[i];
-            //     let prevDiaSquare = secondDiagonal[i - 1];
-            //     let newSquare = square - diaSquare;
-            //     let prevSquare = square - prevDiaSquare;
-
-            //     function checkValidBishopSquare() {
-            //         if (findSquareRank(newSquare) !== findSquareRank(prevSquare)) {
-            //             return true;
-            //         } else {
-            //             return false;
-            //         }
-            //     }
-
-            //     if (checkValidBishopSquare()) {
-            //         if (board[newSquare]) {
-            //             if (board[newSquare].player === currentPlayer) {
-            //                 break;
-            //             }
-            //             if (board[newSquare].player !== currentPlayer) {
-            //                 movesArr.push(newSquare);
-            //                 break;
-            //             }
-            //         } else if (!board[newSquare]) {
-            //             movesArr.push(newSquare);
-            //         }
-            //     } else {
-            //         break;
-            //     }
-            // }
         }
 
         return movesArr;
@@ -267,7 +299,7 @@ function GameBoard() {
 
     function findPossibleMoves(array) {
         if (array !== undefined) {
-            // console.log(`These square indexes: ${array} - are possible moves`);
+            console.log(`These square indexes: ${array} - are possible moves`);
             setPossibleMoves(array)
         } else {
             return;
@@ -284,7 +316,8 @@ function GameBoard() {
         } else {
             return;
         }
-        if (validSquare && playerTurn === board[selectedPiece].player) {
+        if (typeof validSquare === 'number' && playerTurn === board[selectedPiece].player) {
+            console.log(validSquare)
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
                     if (index === validSquare) {
@@ -325,11 +358,11 @@ function GameBoard() {
         }
     }, [selectedPiece])
 
-    // useEffect(() => {
-    //     if (possibleMoves.length < 0) {
-    //         console.log(possibleMoves)
-    //     }
-    // }, [possibleMoves])
+    useEffect(() => {
+        if (possibleMoves.length < 0) {
+            console.log(possibleMoves)
+        }
+    }, [possibleMoves])
 
     // useEffect(() => {
     //     console.log(board)
