@@ -9,6 +9,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
+    }
+
+    &__index {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        font-weight: bold;
     }
 
     .highlighted {

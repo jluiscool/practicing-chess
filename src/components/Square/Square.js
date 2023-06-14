@@ -69,6 +69,7 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
         <div className={`square ${backgroundColor}`} >
             <div className={addClassNames()} onClick={(e) => handleOnClick(e)}>
                 {piece ? renderComponent(piece.piece, piece.player) : ""}
+                <p className='square__index'>{id}</p>
             </div>
         </div>
     )
