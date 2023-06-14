@@ -115,6 +115,11 @@ function GameBoard() {
         }
     }
 
+    function findSquareRank(index) {
+        let rank = Math.trunc((index / ranks));
+        return rank;
+    }
+
     function pawnMoves(piece, index) {
         const possibleMovesArr = [];
         //capture pieces
@@ -154,37 +159,69 @@ function GameBoard() {
         return possibleMovesArr;
     }
 
-    function bishopMoves(piece, index) {
+    function bishopMoves(piece, square) {
+        const firstDiagonal = [7, 14, 21, 28, 35, 42, 49];
+        const secondDiagonal = [9, 18, 27, 36, 45, 54, 63];
+        const currentPlayer = piece.player;
         const movesArr = [];
-        if (piece.player === 'white') {
-            if (board[index - 7] == false || board[index - 7].player === 'black') {
-                console.log(Math.trunc(index / files - 1) === Math.trunc((index - 7) / ranks))
-                movesArr.push(index - 7);
-                if (board[index - 14] == false || board[index - 14].player === 'black') {
-                    movesArr.push(index - 14);
-                    if (board[index - 21] == false || board[index - 21].player === 'black') {
-                        movesArr.push(index - 21);
-                        if (board[index - 28] == false || board[index - 28].player === 'black') {
-                            movesArr.push(index - 28);
-                            if (board[index - 35] == false || board[index - 35].player === 'black') {
-                                movesArr.push(index - 35);
-                                if (board[index - 42] == false || board[index - 42].player === 'black') {
-                                    movesArr.push(index - 42);
-                                    if (board[index - 49] == false || board[index - 49].player === 'black') {
-                                        movesArr.push(index - 49);
-                                        if (board[index - 56] == false || board[index - 56].player === 'black') {
-                                            movesArr.push(index - 56);
-                                            // if (board[index - 63] == false || board[index - 63].player === 'black') {
-                                            //     movesArr.push(index - 63);
-                                            // }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+        if (currentPlayer === 'white') {
+            for (let i = 0; i < firstDiagonal.length; i++) {
+                let diaSquare = firstDiagonal[i];
+                let prevDiaSquare = firstDiagonal[i - 1];
+                let newSquare = square - diaSquare;
+                let prevSquare = square - prevDiaSquare;
+
+
+                function checkValidBishopSquare() {
+                    if (findSquareRank(newSquare) !== findSquareRank(prevSquare)) {
+                        return true;
+                    } else {
+                        return false;
                     }
                 }
+
+
+
+                // console.log(findSquareRank(newSquare) === findSquareRank(prevSquare))
+
+                if (checkValidBishopSquare()) {
+                    if (board[newSquare]) {
+                        if (board[newSquare].player === currentPlayer) {
+                            break;
+                        }
+                        if (board[newSquare].player !== currentPlayer) {
+                            movesArr.push(newSquare);
+                            break;
+                        }
+                    } else if (!board[newSquare]) {
+                        movesArr.push(newSquare);
+                    }
+                } /* else {
+                    return;
+                } */
             }
+            // if (board[index - 7] == false || board[index - 7].player === 'black') {
+            //     console.log(Math.trunc(index / files - 1) === Math.trunc((index - 7) / ranks))
+            //     movesArr.push(index - 7);
+            //     if (board[index - 14] == false || board[index - 14].player === 'black') {
+            //         movesArr.push(index - 14);
+            //         if (board[index - 21] == false || board[index - 21].player === 'black') {
+            //             movesArr.push(index - 21);
+            //             if (board[index - 28] == false || board[index - 28].player === 'black') {
+            //                 movesArr.push(index - 28);
+            //                 if (board[index - 35] == false || board[index - 35].player === 'black') {
+            //                     movesArr.push(index - 35);
+            //                     if (board[index - 42] == false || board[index - 42].player === 'black') {
+            //                         movesArr.push(index - 42);
+            //                         if (board[index - 49] == false || board[index - 49].player === 'black') {
+            //                             movesArr.push(index - 49);
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
             // if (board[index - 9] == false || board[index - 9].player === 'black') {
             //     movesArr.push(index - 9);
             //     if (board[index - 18] == false || board[index - 18].player === 'black') {
@@ -194,18 +231,17 @@ function GameBoard() {
             //         }
             //     }
             // }
-        } else if (piece.player === 'black') {
-            movesArr.push(index + 7);
-            movesArr.push(index + 9);
-            movesArr.push(index + 14);
-            movesArr.push(index + 18);
         }
         return movesArr;
     }
 
     function findPossibleMoves(array) {
-        console.log(`These square indexes: ${array} - are possible moves`);
-        setPossibleMoves(array)
+        if (array !== undefined) {
+            console.log(`These square indexes: ${array} - are possible moves`);
+            setPossibleMoves(array)
+        } else {
+            return;
+        }
     }
 
     function movePiece(squareToMove) {
@@ -215,12 +251,10 @@ function GameBoard() {
                 if (squareToMove === possibleMoves[i])
                     validSquare = possibleMoves[i]
             }
-            console.log(validSquare)
         } else {
             return;
         }
         if (validSquare && playerTurn === board[selectedPiece].player) {
-            console.log(`You can move to this square ${validSquare}`)
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
                     if (index === validSquare) {
@@ -242,7 +276,7 @@ function GameBoard() {
                 return newBoard;
             })
         } else {
-            console.log('You cant move to this square')
+            return;
         }
     }
 
