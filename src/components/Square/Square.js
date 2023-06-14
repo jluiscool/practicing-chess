@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './Square.scss'
 import Bishop from '../Pieces/Bishop';
 import Rook from '../Pieces/Rook';
@@ -10,6 +10,8 @@ import King from '../Pieces/King';
 function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possibleMoves, movePiece }) {
 
     const selected = selectedPiece;
+
+    const squareRef = useRef(null);
 
     let amIAValidMove = validMove();
 
@@ -59,7 +61,10 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
     }
 
     function handleOnClick(e) {
-        if (e.target.hasChildNodes()) {
+        // if (e.target.hasChildNodes()) {
+        //     selectAPiece(id)
+        // }
+        if (e.target.childNodes.length === 2) {
             selectAPiece(id)
         }
         movePiece(id)
@@ -67,7 +72,7 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
 
     return (
         <div className={`square ${backgroundColor}`} >
-            <div className={addClassNames()} onClick={(e) => handleOnClick(e)}>
+            <div className={addClassNames()} onClick={(e) => handleOnClick(e)} ref={squareRef}>
                 {piece ? renderComponent(piece.piece, piece.player) : ""}
                 <p className='square__index'>{id}</p>
             </div>

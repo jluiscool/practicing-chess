@@ -116,7 +116,6 @@ function GameBoard() {
     }
 
     function pawnMoves(piece, index) {
-        console.log(index)
         const arr = [];
         if (piece.player === 'white') {
             if (6 <= index / ranks && index / ranks < 7 && board[index - 8] == false) {
@@ -128,6 +127,12 @@ function GameBoard() {
             if (index / ranks < 6 && board[index - 8] == false) {
                 arr.push(index - 8);
             }
+            if (board[index - 7].player === 'black') {
+                arr.push(index - 7);
+            }
+            if (board[index - 9].player === 'black') {
+                arr.push(index - 9);
+            }
         }
         if (piece.player === 'black') {
             if (1 <= index / ranks && index / ranks < 2 && board[index + 8] == false) {
@@ -138,14 +143,11 @@ function GameBoard() {
             if (index / ranks > 2 && board[index + 8] == false) {
                 arr.push(index + 8);
             }
-            if (board[index + 7] == true) {
+            if (board[index + 7].player === 'white') {
                 arr.push(index + 7);
             }
-            if (board[index + 9] == true) {
+            if (board[index + 9].player === 'white') {
                 arr.push(index + 9);
-            }
-            else {
-                console.log('wtf')
             }
         }
         return arr;
@@ -204,6 +206,7 @@ function GameBoard() {
                 } else {
                     setPlayerTurn('white')
                 }
+                setSelectedPiece(null)
                 return newBoard;
             })
         } else {
