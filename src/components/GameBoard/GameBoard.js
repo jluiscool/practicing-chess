@@ -165,24 +165,20 @@ function GameBoard() {
         const currentPlayer = piece.player;
         const movesArr = [];
         if (currentPlayer === 'white') {
+            //right-up diagonal moves
             for (let i = 0; i < firstDiagonal.length; i++) {
                 let diaSquare = firstDiagonal[i];
                 let prevDiaSquare = firstDiagonal[i - 1];
                 let newSquare = square - diaSquare;
                 let prevSquare = square - prevDiaSquare;
 
-
                 function checkValidBishopSquare() {
-                    if (findSquareRank(newSquare) !== findSquareRank(prevSquare)) {
+                    if (findSquareRank(newSquare) !== findSquareRank(prevSquare) && findSquareRank(newSquare) !== findSquareRank(square)) {
                         return true;
                     } else {
                         return false;
                     }
                 }
-
-
-
-                // console.log(findSquareRank(newSquare) === findSquareRank(prevSquare))
 
                 if (checkValidBishopSquare()) {
                     if (board[newSquare]) {
@@ -196,48 +192,82 @@ function GameBoard() {
                     } else if (!board[newSquare]) {
                         movesArr.push(newSquare);
                     }
-                } /* else {
-                    return;
-                } */
+                } else {
+                    break;
+                }
             }
-            // if (board[index - 7] == false || board[index - 7].player === 'black') {
-            //     console.log(Math.trunc(index / files - 1) === Math.trunc((index - 7) / ranks))
-            //     movesArr.push(index - 7);
-            //     if (board[index - 14] == false || board[index - 14].player === 'black') {
-            //         movesArr.push(index - 14);
-            //         if (board[index - 21] == false || board[index - 21].player === 'black') {
-            //             movesArr.push(index - 21);
-            //             if (board[index - 28] == false || board[index - 28].player === 'black') {
-            //                 movesArr.push(index - 28);
-            //                 if (board[index - 35] == false || board[index - 35].player === 'black') {
-            //                     movesArr.push(index - 35);
-            //                     if (board[index - 42] == false || board[index - 42].player === 'black') {
-            //                         movesArr.push(index - 42);
-            //                         if (board[index - 49] == false || board[index - 49].player === 'black') {
-            //                             movesArr.push(index - 49);
-            //                         }
-            //                     }
-            //                 }
-            //             }
+
+            //left-down diagonal moves
+            for (let i = firstDiagonal.length; i >= 0; i--) {
+                let diaSquare = firstDiagonal[i];
+                let prevDiaSquare = firstDiagonal[i + 1];
+                let newSquare = square - diaSquare;
+                let prevSquare = square - prevDiaSquare;
+
+                function checkValidBishopSquare() {
+                    if (findSquareRank(newSquare) !== findSquareRank(prevSquare) && findSquareRank(newSquare) !== findSquareRank(square)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                if (checkValidBishopSquare()) {
+                    if (board[newSquare]) {
+                        if (board[newSquare].player === currentPlayer) {
+                            break;
+                        }
+                        if (board[newSquare].player !== currentPlayer) {
+                            movesArr.push(newSquare);
+                            break;
+                        }
+                    } else if (!board[newSquare]) {
+                        movesArr.push(newSquare);
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            //left diagonal moves
+            // for (let i = 0; i < secondDiagonal.length; i++) {
+            //     let diaSquare = secondDiagonal[i];
+            //     let prevDiaSquare = secondDiagonal[i - 1];
+            //     let newSquare = square - diaSquare;
+            //     let prevSquare = square - prevDiaSquare;
+
+            //     function checkValidBishopSquare() {
+            //         if (findSquareRank(newSquare) !== findSquareRank(prevSquare)) {
+            //             return true;
+            //         } else {
+            //             return false;
             //         }
             //     }
-            // }
-            // if (board[index - 9] == false || board[index - 9].player === 'black') {
-            //     movesArr.push(index - 9);
-            //     if (board[index - 18] == false || board[index - 18].player === 'black') {
-            //         movesArr.push(index - 18);
-            //         if (board[index - 27] == false || board[index - 27].player === 'black') {
-            //             movesArr.push(index - 27);
+
+            //     if (checkValidBishopSquare()) {
+            //         if (board[newSquare]) {
+            //             if (board[newSquare].player === currentPlayer) {
+            //                 break;
+            //             }
+            //             if (board[newSquare].player !== currentPlayer) {
+            //                 movesArr.push(newSquare);
+            //                 break;
+            //             }
+            //         } else if (!board[newSquare]) {
+            //             movesArr.push(newSquare);
             //         }
+            //     } else {
+            //         break;
             //     }
             // }
         }
+
         return movesArr;
     }
 
     function findPossibleMoves(array) {
         if (array !== undefined) {
-            console.log(`These square indexes: ${array} - are possible moves`);
+            // console.log(`These square indexes: ${array} - are possible moves`);
             setPossibleMoves(array)
         } else {
             return;
