@@ -211,6 +211,8 @@ function GameBoard() {
         }
     }
 
+    //handle clicking on a piece
+
     useEffect(() => {
         if (selectedPiece) {
             if (board[selectedPiece].piece === 'Pawn') {
