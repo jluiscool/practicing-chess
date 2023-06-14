@@ -66,6 +66,8 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
         // }
         if (e.target.childNodes.length === 2) {
             selectAPiece(id)
+        } else if (e.target.childNodes.length < 2) {
+            selectAPiece(null)
         }
         movePiece(id)
     }

@@ -116,59 +116,91 @@ function GameBoard() {
     }
 
     function pawnMoves(piece, index) {
-        const arr = [];
+        const possibleMovesArr = [];
+        //capture pieces
         if (piece.player === 'white') {
             if (6 <= index / ranks && index / ranks < 7 && board[index - 8] == false) {
-                arr.push(index - 8);
+                possibleMovesArr.push(index - 8);
                 if (board[index - 16] == false) {
-                    arr.push(index - 16);
+                    possibleMovesArr.push(index - 16);
                 }
             }
             if (index / ranks < 6 && board[index - 8] == false) {
-                arr.push(index - 8);
+                possibleMovesArr.push(index - 8);
             }
             if (board[index - 7].player === 'black') {
-                arr.push(index - 7);
+                possibleMovesArr.push(index - 7);
             }
             if (board[index - 9].player === 'black') {
-                arr.push(index - 9);
+                possibleMovesArr.push(index - 9);
             }
         }
         if (piece.player === 'black') {
             if (1 <= index / ranks && index / ranks < 2 && board[index + 8] == false) {
-                arr.push(index + 8);
+                possibleMovesArr.push(index + 8);
                 if (board[index + 16] == false)
-                    arr.push(index + 16);
+                    possibleMovesArr.push(index + 16);
             }
             if (index / ranks > 2 && board[index + 8] == false) {
-                arr.push(index + 8);
+                possibleMovesArr.push(index + 8);
             }
             if (board[index + 7].player === 'white') {
-                arr.push(index + 7);
+                possibleMovesArr.push(index + 7);
             }
             if (board[index + 9].player === 'white') {
-                arr.push(index + 9);
+                possibleMovesArr.push(index + 9);
             }
         }
-        return arr;
+        return possibleMovesArr;
     }
 
     function bishopMoves(piece, index) {
-        const arr = [];
+        const movesArr = [];
         if (piece.player === 'white') {
-            arr.push(index - 7);
-            arr.push(index - 9);
-            arr.push(index - 14);
-            arr.push(index - 18);
-            arr.push(index - 21);
-            arr.push(index - 27);
+            if (board[index - 7] == false || board[index - 7].player === 'black') {
+                console.log(Math.trunc(index / files - 1) === Math.trunc((index - 7) / ranks))
+                movesArr.push(index - 7);
+                if (board[index - 14] == false || board[index - 14].player === 'black') {
+                    movesArr.push(index - 14);
+                    if (board[index - 21] == false || board[index - 21].player === 'black') {
+                        movesArr.push(index - 21);
+                        if (board[index - 28] == false || board[index - 28].player === 'black') {
+                            movesArr.push(index - 28);
+                            if (board[index - 35] == false || board[index - 35].player === 'black') {
+                                movesArr.push(index - 35);
+                                if (board[index - 42] == false || board[index - 42].player === 'black') {
+                                    movesArr.push(index - 42);
+                                    if (board[index - 49] == false || board[index - 49].player === 'black') {
+                                        movesArr.push(index - 49);
+                                        if (board[index - 56] == false || board[index - 56].player === 'black') {
+                                            movesArr.push(index - 56);
+                                            // if (board[index - 63] == false || board[index - 63].player === 'black') {
+                                            //     movesArr.push(index - 63);
+                                            // }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // if (board[index - 9] == false || board[index - 9].player === 'black') {
+            //     movesArr.push(index - 9);
+            //     if (board[index - 18] == false || board[index - 18].player === 'black') {
+            //         movesArr.push(index - 18);
+            //         if (board[index - 27] == false || board[index - 27].player === 'black') {
+            //             movesArr.push(index - 27);
+            //         }
+            //     }
+            // }
         } else if (piece.player === 'black') {
-            arr.push(index + 7);
-            arr.push(index + 9);
-            arr.push(index + 14);
-            arr.push(index + 18);
+            movesArr.push(index + 7);
+            movesArr.push(index + 9);
+            movesArr.push(index + 14);
+            movesArr.push(index + 18);
         }
-        return arr;
+        return movesArr;
     }
 
     function findPossibleMoves(array) {
