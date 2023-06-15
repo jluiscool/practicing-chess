@@ -275,6 +275,8 @@ function GameBoard() {
         let pieceRank = findSquareRank(square)
         let pieceFile = findSquareFile(square)
 
+        console.log(pieceRank)
+
         //going right
         for (let i = square + 1; findSquareRank(i) == pieceRank; i++) {
             if (board[i]) {
@@ -300,6 +302,8 @@ function GameBoard() {
                     movesArr.push(i);
                     break;
                 }
+            } else if (i < 0) {
+                break;
             } else if (!board[i]) {
                 movesArr.push(i);
             }
@@ -313,7 +317,7 @@ function GameBoard() {
 
         //going up
         for (let i = square - 8; i >= 0; i -= 8) {
-            if (checkOneFileDiff(square, i)) {
+            if (checkOneFileDiff(i + 8, i)) {
                 if (board[i]) {
                     if (board[i].player === currentPlayer) {
                         break;
@@ -327,7 +331,22 @@ function GameBoard() {
                 }
             }
         }
-
+        //going down
+        for (let i = square + 8; i < 64; i += 8) {
+            if (checkOneFileDiff(i - 8, i)) {
+                if (board[i]) {
+                    if (board[i].player === currentPlayer) {
+                        break;
+                    }
+                    if (board[i].player !== currentPlayer) {
+                        movesArr.push(i);
+                        break;
+                    }
+                } else if (!board[i]) {
+                    movesArr.push(i);
+                }
+            }
+        }
         return movesArr;
     }
 
@@ -342,7 +361,7 @@ function GameBoard() {
 
     function movePiece(squareToMove) {
         let validSquare;
-        if (selectedPiece && possibleMoves.length > 0) {
+        if (typeof selectedPiece === 'number' && possibleMoves.length > 0) {
             for (let i = 0; i < possibleMoves.length; i++) {
                 if (squareToMove === possibleMoves[i])
                     validSquare = possibleMoves[i]
@@ -380,7 +399,7 @@ function GameBoard() {
     //handle clicking on a piece
 
     useEffect(() => {
-        if (selectedPiece) {
+        if (selectedPiece !== null) {
             if (board[selectedPiece].piece === 'Pawn') {
                 findPossibleMoves(pawnMoves(board[selectedPiece], selectedPiece))
             }
@@ -391,12 +410,13 @@ function GameBoard() {
                 findPossibleMoves(rookMoves(board[selectedPiece], selectedPiece))
             }
         } else {
+            console.log(selectedPiece)
             setPossibleMoves([])
         }
     }, [selectedPiece])
 
     useEffect(() => {
-        if (possibleMoves.length < 0) {
+        if (possibleMoves.length > 0) {
             console.log(possibleMoves)
         }
     }, [possibleMoves])
