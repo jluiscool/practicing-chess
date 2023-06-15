@@ -228,38 +228,6 @@ function GameBoard() {
                     break;
                 }
             }
-
-            //left diagonal moves
-            // for (let i = 0; i < secondDiagonal.length; i++) {
-            //     let diaSquare = secondDiagonal[i];
-            //     let prevDiaSquare = secondDiagonal[i - 1];
-            //     let newSquare = square - diaSquare;
-            //     let prevSquare = square - prevDiaSquare;
-
-            //     function checkValidBishopSquare() {
-            //         if (findSquareRank(newSquare) !== findSquareRank(prevSquare)) {
-            //             return true;
-            //         } else {
-            //             return false;
-            //         }
-            //     }
-
-            //     if (checkValidBishopSquare()) {
-            //         if (board[newSquare]) {
-            //             if (board[newSquare].player === currentPlayer) {
-            //                 break;
-            //             }
-            //             if (board[newSquare].player !== currentPlayer) {
-            //                 movesArr.push(newSquare);
-            //                 break;
-            //             }
-            //         } else if (!board[newSquare]) {
-            //             movesArr.push(newSquare);
-            //         }
-            //     } else {
-            //         break;
-            //     }
-            // }
         }
 
         return movesArr;
