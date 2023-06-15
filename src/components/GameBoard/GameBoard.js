@@ -360,6 +360,43 @@ function GameBoard() {
         return movesArr;
     }
 
+    function kingMoves(piece, square) {
+        let movesArr = [];
+        let currentPlayer = piece.player;
+        let rightMove = square + 1;
+        let leftMove = square - 1
+
+        // going down
+        for (let i = square + 7; i < square + 10 && i < 64; i++) {
+            if (board[i]) {
+                if (board[i].player !== currentPlayer) {
+                    movesArr.push(i);
+                }
+            } else if (!board[i]) {
+                movesArr.push(i);
+            }
+        }
+        //going up
+        for (let i = square - 7; i > square - 10 && i >= 0; i--) {
+            if (board[i]) {
+                if (board[i].player !== currentPlayer) {
+                    movesArr.push(i);
+                }
+            } else if (!board[i]) {
+                movesArr.push(i);
+            }
+        }
+        // right
+        if (board[rightMove].player !== currentPlayer) {
+            movesArr.push(rightMove);
+        } 
+        // left
+        if (board[leftMove].player !== currentPlayer) {
+            movesArr.push(leftMove);
+        }
+        return movesArr;
+    }
+
     function findPossibleMoves(array) {
         if (array !== undefined) {
             console.log(`These square indexes: ${array} - are possible moves`);
@@ -421,6 +458,9 @@ function GameBoard() {
             }
             if (board[selectedPiece].piece === 'Queen') {
                 findPossibleMoves(queenMoves(board[selectedPiece], selectedPiece))
+            }
+            if (board[selectedPiece].piece === 'King') {
+                findPossibleMoves(kingMoves(board[selectedPiece], selectedPiece))
             }
         } else {
             console.log(selectedPiece)
