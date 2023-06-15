@@ -125,7 +125,6 @@ function GameBoard() {
         return file;
     }
 
-
     function pawnMoves(piece, index) {
         const possibleMovesArr = [];
         //capture pieces
@@ -174,11 +173,18 @@ function GameBoard() {
         }
     }
 
+    function checkOneFileDiff(newSquare, currSquare) {
+        let diff = Math.abs(newSquare - currSquare);
+        console.log(diff)
+        if (diff === 8) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function bishopMoves(piece, square) {
-        const firstDiagonal = [7, 14, 21, 28, 35, 42, 49];
-        const secondDiagonal = [9, 18, 27, 36, 45, 54, 63];
         const currentPlayer = piece.player;
-        const directions = 4;
         const movesArr = [];
 
         //index going down by 7
@@ -263,6 +269,68 @@ function GameBoard() {
         return movesArr;
     }
 
+    function rookMoves(piece, square) {
+        const currentPlayer = piece.player;
+        const movesArr = [];
+        let pieceRank = findSquareRank(square)
+        let pieceFile = findSquareFile(square)
+
+        //going right
+        for (let i = square + 1; findSquareRank(i) == pieceRank; i++) {
+            if (board[i]) {
+                if (board[i].player === currentPlayer) {
+                    break;
+                }
+                if (board[i].player !== currentPlayer) {
+                    movesArr.push(i);
+                    break;
+                }
+            } else if (!board[i]) {
+                movesArr.push(i);
+            }
+        }
+
+        //going left
+        for (let i = square - 1; findSquareRank(i) == pieceRank; i--) {
+            if (board[i]) {
+                if (board[i].player === currentPlayer) {
+                    break;
+                }
+                if (board[i].player !== currentPlayer) {
+                    movesArr.push(i);
+                    break;
+                }
+            } else if (!board[i]) {
+                movesArr.push(i);
+            }
+        }
+
+        //vertical moves
+        // get file
+        // if newsquare  file = current square file
+        //push to moveArr
+        // else break;
+
+        //going up
+        for (let i = square - 8; i >= 0; i -= 8) {
+            if (checkOneFileDiff(square, i)) {
+                if (board[i]) {
+                    if (board[i].player === currentPlayer) {
+                        break;
+                    }
+                    if (board[i].player !== currentPlayer) {
+                        movesArr.push(i);
+                        break;
+                    }
+                } else if (!board[i]) {
+                    movesArr.push(i);
+                }
+            }
+        }
+
+        return movesArr;
+    }
+
     function findPossibleMoves(array) {
         if (array !== undefined) {
             console.log(`These square indexes: ${array} - are possible moves`);
@@ -318,6 +386,9 @@ function GameBoard() {
             }
             if (board[selectedPiece].piece === 'Bishop') {
                 findPossibleMoves(bishopMoves(board[selectedPiece], selectedPiece))
+            }
+            if (board[selectedPiece].piece === 'Rook') {
+                findPossibleMoves(rookMoves(board[selectedPiece], selectedPiece))
             }
         } else {
             setPossibleMoves([])
