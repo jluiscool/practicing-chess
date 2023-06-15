@@ -350,6 +350,16 @@ function GameBoard() {
         return movesArr;
     }
 
+    function queenMoves(piece, square) {
+        let movesArr = [];
+        let crossMoves = rookMoves(piece, square)
+        let diaMoves = bishopMoves(piece, square)
+        movesArr = [...crossMoves, ...diaMoves];
+        console.log(movesArr)
+
+        return movesArr;
+    }
+
     function findPossibleMoves(array) {
         if (array !== undefined) {
             console.log(`These square indexes: ${array} - are possible moves`);
@@ -408,6 +418,9 @@ function GameBoard() {
             }
             if (board[selectedPiece].piece === 'Rook') {
                 findPossibleMoves(rookMoves(board[selectedPiece], selectedPiece))
+            }
+            if (board[selectedPiece].piece === 'Queen') {
+                findPossibleMoves(queenMoves(board[selectedPiece], selectedPiece))
             }
         } else {
             console.log(selectedPiece)
