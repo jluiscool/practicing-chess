@@ -10,6 +10,12 @@ function GameBoard() {
 
     const [possibleMoves, setPossibleMoves] = useState([]);
 
+    const [isInCheck, setIsInCheck] = useState(false);
+
+    const [squaresAttackedByWhite, setSquaresAttackedByWhite] = useState([]);
+
+    const [squaresAttackedByBlack, setSquaresAttackedByBlack] = useState([]);
+
     const ranks = 8;
     const files = 8;
 
@@ -164,19 +170,25 @@ function GameBoard() {
         return possibleMovesArr;
     }
 
-    function checkOneRankDiff(newSquare, prevSquare) {
+    function checkRankDiff(newSquare, prevSquare, rankDiff) {
         let diff = Math.abs(findSquareRank(newSquare) - findSquareRank(prevSquare))
-        if (diff === 1) {
+        if (diff === rankDiff) {
             return true;
         } else {
             return false;
         }
     }
 
-    function checkOneFileDiff(newSquare, currSquare) {
-        let diff = Math.abs(newSquare - currSquare);
-        console.log(diff)
-        if (diff === 8) {
+    function checkNewFileDiff(newSquare, currSquare, fileDiff) {
+
+        let currSquareFile = (currSquare / 8) % 1;
+        let newSquareFile = (newSquare / 8) % 1
+
+        let squareDiff = Math.abs(currSquareFile - newSquareFile);
+
+        let diff = fileDiff / 8;
+
+        if (squareDiff === diff) {
             return true;
         } else {
             return false;
@@ -189,8 +201,7 @@ function GameBoard() {
 
         //index going down by 7
         for (let i = square - 7; i >= 0; i -= 7) {
-            console.log(i);
-            if (checkOneRankDiff(i, i + 7)) {
+            if (checkRankDiff(i, i + 7, 1)) {
                 if (board[i]) {
                     if (board[i].player === currentPlayer) {
                         break;
@@ -208,8 +219,7 @@ function GameBoard() {
         }
         //index going down by 9
         for (let i = square - 9; i >= 0; i -= 9) {
-            console.log(i);
-            if (checkOneRankDiff(i, i + 9)) {
+            if (checkRankDiff(i, i + 9, 1)) {
                 if (board[i]) {
                     if (board[i].player === currentPlayer) {
                         break;
@@ -228,8 +238,7 @@ function GameBoard() {
 
         //index going up by 7
         for (let i = square + 7; i < 64; i += 7) {
-            console.log(i);
-            if (checkOneRankDiff(i, i - 7)) {
+            if (checkRankDiff(i, i - 7, 1)) {
                 if (board[i]) {
                     if (board[i].player === currentPlayer) {
                         break;
@@ -248,8 +257,7 @@ function GameBoard() {
 
         //index going up by 9
         for (let i = square + 9; i < 64; i += 9) {
-            console.log(i);
-            if (checkOneRankDiff(i, i - 9)) {
+            if (checkRankDiff(i, i - 9, 1)) {
                 if (board[i]) {
                     if (board[i].player === currentPlayer) {
                         break;
@@ -274,8 +282,6 @@ function GameBoard() {
         const movesArr = [];
         let pieceRank = findSquareRank(square)
         let pieceFile = findSquareFile(square)
-
-        console.log(pieceRank)
 
         //going right
         for (let i = square + 1; findSquareRank(i) == pieceRank; i++) {
@@ -309,15 +315,9 @@ function GameBoard() {
             }
         }
 
-        //vertical moves
-        // get file
-        // if newsquare  file = current square file
-        //push to moveArr
-        // else break;
-
         //going up
         for (let i = square - 8; i >= 0; i -= 8) {
-            if (checkOneFileDiff(i + 8, i)) {
+            if (checkNewFileDiff(i + 8, i, 0)) {
                 if (board[i]) {
                     if (board[i].player === currentPlayer) {
                         break;
@@ -333,7 +333,7 @@ function GameBoard() {
         }
         //going down
         for (let i = square + 8; i < 64; i += 8) {
-            if (checkOneFileDiff(i - 8, i)) {
+            if (checkNewFileDiff(i - 8, i, 0)) {
                 if (board[i]) {
                     if (board[i].player === currentPlayer) {
                         break;
@@ -355,7 +355,6 @@ function GameBoard() {
         let crossMoves = rookMoves(piece, square)
         let diaMoves = bishopMoves(piece, square)
         movesArr = [...crossMoves, ...diaMoves];
-        console.log(movesArr)
 
         return movesArr;
     }
@@ -389,7 +388,7 @@ function GameBoard() {
         // right
         if (board[rightMove].player !== currentPlayer) {
             movesArr.push(rightMove);
-        } 
+        }
         // left
         if (board[leftMove].player !== currentPlayer) {
             movesArr.push(leftMove);
@@ -397,14 +396,54 @@ function GameBoard() {
         return movesArr;
     }
 
-    function findPossibleMoves(array) {
-        if (array !== undefined) {
-            console.log(`These square indexes: ${array} - are possible moves`);
-            setPossibleMoves(array)
-        } else {
-            return;
+    function knightMoves(piece, square) {
+        let movesArr = [];
+        let currentPlayer = piece.player;
+        let topRight = square - 15;
+        let rightTop = square - 6;
+        let rightBottom = square + 10;
+        let bottomRight = square + 17;
+        let bottomLeft = square + 15;
+        let leftBottom = square + 6;
+        let leftTop = square - 10;
+        let topLeft = square - 17;
+
+        if (board[topRight] !== undefined && board[topRight].player != currentPlayer && topRight < 64 && topRight >= 0 && checkNewFileDiff(topRight, square, 1)) {
+            movesArr.push(topRight)
         }
+        if (board[rightTop] !== undefined && board[rightTop].player != currentPlayer && rightTop < 64 && rightTop >= 0 && checkNewFileDiff(rightTop, square, 2)) {
+            movesArr.push(rightTop)
+        }
+        if (board[rightBottom] !== undefined && board[rightBottom].player != currentPlayer && rightBottom < 64 && rightBottom >= 0 && checkNewFileDiff(rightBottom, square, 2)) {
+            movesArr.push(rightBottom)
+        }
+        if (board[bottomRight] !== undefined && board[bottomRight].player != currentPlayer && bottomRight < 64 && bottomRight >= 0 && checkNewFileDiff(bottomRight, square, 1)) {
+            movesArr.push(bottomRight)
+        }
+        if (board[bottomLeft] !== undefined && board[bottomLeft].player != currentPlayer && bottomLeft < 64 && bottomLeft >= 0 && checkNewFileDiff(bottomLeft, square, 1)) {
+            movesArr.push(bottomLeft)
+        }
+        if (board[leftBottom] !== undefined && board[leftBottom].player != currentPlayer && leftBottom < 64 && leftBottom >= 0 && checkNewFileDiff(leftBottom, square, 2)) {
+            movesArr.push(leftBottom)
+        }
+        if (board[leftTop] !== undefined && board[leftTop].player != currentPlayer && leftTop < 64 && leftTop >= 0 && checkNewFileDiff(leftTop, square, 2)) {
+            movesArr.push(leftTop)
+        }
+        if (board[topLeft] !== undefined && board[topLeft].player != currentPlayer && topLeft < 64 && topLeft >= 0 && checkNewFileDiff(topLeft, square, 1)) {
+            movesArr.push(topLeft)
+        }
+
+        return movesArr;
     }
+
+    // function handlePossibleMoves(array) {
+    //     if (array !== undefined) {
+    //         console.log(`These square indexes: ${array} - are possible moves`);
+    //         setPossibleMoves(array)
+    //     } else {
+    //         return;
+    //     }
+    // }
 
     function movePiece(squareToMove) {
         let validSquare;
@@ -417,7 +456,6 @@ function GameBoard() {
             return;
         }
         if (typeof validSquare === 'number' && playerTurn === board[selectedPiece].player) {
-            console.log(validSquare)
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
                     if (index === validSquare) {
@@ -443,36 +481,71 @@ function GameBoard() {
         }
     }
 
-    //handle clicking on a piece
+    function handleThisPiece(square) {
+        let potentialMoves = [];
+        if (board[square].piece === 'Pawn') {
+            potentialMoves.push(...pawnMoves(board[square], square));
+        }
+        if (board[square].piece === 'Bishop') {
+            potentialMoves.push(...bishopMoves(board[square], square));
+        }
+        if (board[square].piece === 'Rook') {
+            potentialMoves.push(...rookMoves(board[square], square));
+        }
+        if (board[square].piece === 'Queen') {
+            potentialMoves.push(...queenMoves(board[square], square));
+        }
+        if (board[square].piece === 'King') {
+            potentialMoves.push(...kingMoves(board[square], square));
+        }
+        if (board[square].piece === 'Knight') {
+            potentialMoves.push(...knightMoves(board[square], square));
+        }
+        return potentialMoves;
+    }
 
+    //handle clicking on a piece
     useEffect(() => {
         if (selectedPiece !== null) {
-            if (board[selectedPiece].piece === 'Pawn') {
-                findPossibleMoves(pawnMoves(board[selectedPiece], selectedPiece))
-            }
-            if (board[selectedPiece].piece === 'Bishop') {
-                findPossibleMoves(bishopMoves(board[selectedPiece], selectedPiece))
-            }
-            if (board[selectedPiece].piece === 'Rook') {
-                findPossibleMoves(rookMoves(board[selectedPiece], selectedPiece))
-            }
-            if (board[selectedPiece].piece === 'Queen') {
-                findPossibleMoves(queenMoves(board[selectedPiece], selectedPiece))
-            }
-            if (board[selectedPiece].piece === 'King') {
-                findPossibleMoves(kingMoves(board[selectedPiece], selectedPiece))
-            }
+            setPossibleMoves(handleThisPiece(selectedPiece));
         } else {
-            console.log(selectedPiece)
             setPossibleMoves([])
         }
     }, [selectedPiece])
 
+    //set player's attacking squares
     useEffect(() => {
-        if (possibleMoves.length > 0) {
-            console.log(possibleMoves)
+        let currentPlayer = playerTurn;
+        let attackedSquaresArrWhite = [];
+        let attackedSquaresArrBlack = [];
+        let currentPlayerKing;
+
+        for (let i = 0; i < board.length; i++) {
+            if (typeof board[i] === "object") {
+                if (board[i].player === 'white') {
+                    attackedSquaresArrWhite.push(...handleThisPiece(i))
+                }
+                if (board[i].player === 'black') {
+                    attackedSquaresArrBlack.push(...handleThisPiece(i))
+                }
+            }
         }
-    }, [possibleMoves])
+        setSquaresAttackedByBlack(attackedSquaresArrBlack)
+        setSquaresAttackedByWhite(attackedSquaresArrWhite)
+
+    }, [board])
+
+    // log players attacking squares
+    useEffect(() => {
+        console.log(`These are the squares attacked by black ${squaresAttackedByBlack}`)
+        console.log(`These are the squares attacked by white ${squaresAttackedByWhite}`)
+    }, [squaresAttackedByBlack, squaresAttackedByWhite])
+
+    // useEffect(() => {
+    //     if (possibleMoves.length > 0) {
+    //         console.log(possibleMoves)
+    //     }
+    // }, [possibleMoves])
 
     return (
         <div className='gameboard'>
