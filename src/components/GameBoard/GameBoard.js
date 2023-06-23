@@ -17,8 +17,8 @@ function GameBoard() {
 
     const [squaresAttackedByBlack, setSquaresAttackedByBlack] = useState([]);
 
-    const [whiteKingSquare, setWhiteKingSquare] = useState(null);
-    const [blackKingSquare, setBlackKingSquare] = useState(null);
+    const [whiteKingSquare, setWhiteKingSquare] = useState(60);
+    const [blackKingSquare, setBlackKingSquare] = useState(4);
 
     const ranks = 8;
     const files = 8;
@@ -440,20 +440,11 @@ function GameBoard() {
         return movesArr;
     }
 
-    // function handlePossibleMoves(array) {
-    //     if (array !== undefined) {
-    //         console.log(`These square indexes: ${array} - are possible moves`);
-    //         setPossibleMoves(array)
-    //     } else {
-    //         return;
-    //     }
-    // }
-
-    function movePiece(squareToMove) {
+    function movePiece(squareToMoveTo) {
         let validSquare;
         if (typeof selectedPiece === 'number' && possibleMoves.length > 0) {
             for (let i = 0; i < possibleMoves.length; i++) {
-                if (squareToMove === possibleMoves[i])
+                if (squareToMoveTo === possibleMoves[i])
                     validSquare = possibleMoves[i]
             }
         } else {
@@ -565,7 +556,7 @@ function GameBoard() {
         }
 
         //check if black is in check
-        console.log(squaresAttackedByWhite)
+        // console.log(squaresAttackedByWhite)
         for (let i = 0; i < squaresAttackedByWhite.length; i++) {
             if (squaresAttackedByWhite[i] === blackKingSquare) {
                 // console.log('The Black King is in Check')
@@ -574,16 +565,20 @@ function GameBoard() {
                 setBlackIsInCheck(false);
             }
         }
-    }, [squaresAttackedByBlack, squaresAttackedByWhite, whiteKingSquare, blackKingSquare])
+    }, [squaresAttackedByBlack, squaresAttackedByWhite, whiteKingSquare, blackKingSquare, board])
 
     useEffect(() => {
+        // console.log(squaresAttackedByBlack);
+        // console.log(whiteKingSquare);
         if (blackIsInCheck) {
             console.log('black is in check')
         }
         if (whiteIsInCheck) {
             console.log('white is in check')
+        } else {
+            console.log('white is no longer in check');
         }
-    }, [blackIsInCheck, whiteIsInCheck])
+    }, [blackIsInCheck, whiteIsInCheck, board])
 
     return (
         <div className='gameboard'>
@@ -598,7 +593,9 @@ function GameBoard() {
                             selectAPiece={selectAPiece}
                             selectedPiece={selectedPiece === index ? true : false}
                             possibleMoves={possibleMoves}
-                            movePiece={movePiece}
+                            movePiece={movePiece} 
+                            isWhiteKingInCheck={whiteIsInCheck ? whiteKingSquare : false} 
+                            isBlackKingInCheck={blackIsInCheck ? whiteKingSquare : false} 
                         />
                     )
                 })

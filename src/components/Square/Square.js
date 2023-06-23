@@ -7,7 +7,7 @@ import Knight from '../Pieces/Knight';
 import Queen from '../Pieces/Queen';
 import King from '../Pieces/King';
 
-function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possibleMoves, movePiece }) {
+function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possibleMoves, movePiece, isWhiteKingInCheck, isBlackKingInCheck }) {
 
     const selected = selectedPiece;
 
@@ -15,6 +15,7 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
 
     let amIAValidMove = validMove();
 
+    //handle class names
     function addClassNames() {
         let classname = "square__container";
         if (selected) {
@@ -23,8 +24,14 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
         if (amIAValidMove) {
             classname += " possible-move"
         }
+        if (isWhiteKingInCheck === id || isBlackKingInCheck === id) {
+            classname += " highlighted-check"
+            console.log(`this square is being attacked${id}`)
+        }
         return classname;
     }
+
+
 
     function validMove() {
         for (let i = 0; i < possibleMoves.length; i++) {
@@ -41,29 +48,26 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
 
     function renderComponent(component, player) {
         if (component === 'King') {
-            return <King playerColor={player} /* isSelected={isSelected} */ />
+            return <King playerColor={player} />
         }
         if (component === 'Queen') {
-            return <Queen playerColor={player} /* isSelected={isSelected} */ />
+            return <Queen playerColor={player} />
         }
         if (component === 'Rook') {
-            return <Rook playerColor={player} /* isSelected={isSelected} */ />
+            return <Rook playerColor={player} />
         }
         if (component === 'Bishop') {
-            return <Bishop playerColor={player} /* isSelected={isSelected} */ />
+            return <Bishop playerColor={player} />
         }
         if (component === 'Knight') {
-            return <Knight playerColor={player} /* isSelected={isSelected} */ />
+            return <Knight playerColor={player} />
         }
         if (component === 'Pawn') {
-            return <Pawn playerColor={player} /* isSelected={isSelected} */ />
+            return <Pawn playerColor={player} />
         }
     }
 
     function handleOnClick(e) {
-        // if (e.target.hasChildNodes()) {
-        //     selectAPiece(id)
-        // }
         if (e.target.childNodes.length === 2) {
             selectAPiece(id)
         } else if (e.target.childNodes.length < 2) {

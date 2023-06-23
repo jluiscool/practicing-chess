@@ -23,8 +23,12 @@
         background-color: yellow;
     }
 
-    .possible-move {
+    .highlighted-check {
         background-color: red;
+    }
+
+    .possible-move {
+        background-color: rgb(32, 175, 32);
     }
 
     &__img {
