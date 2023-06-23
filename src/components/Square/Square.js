@@ -26,7 +26,6 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
         }
         if (isWhiteKingInCheck === id || isBlackKingInCheck === id) {
             classname += " highlighted-check"
-            console.log(`this square is being attacked${id}`)
         }
         return classname;
     }
