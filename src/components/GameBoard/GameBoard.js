@@ -10,11 +10,15 @@ function GameBoard() {
 
     const [possibleMoves, setPossibleMoves] = useState([]);
 
-    const [isInCheck, setIsInCheck] = useState(false);
+    const [whiteIsInCheck, setWhiteIsInCheck] = useState(false);
+    const [blackIsInCheck, setBlackIsInCheck] = useState(false);
 
     const [squaresAttackedByWhite, setSquaresAttackedByWhite] = useState([]);
 
     const [squaresAttackedByBlack, setSquaresAttackedByBlack] = useState([]);
+
+    const [whiteKingSquare, setWhiteKingSquare] = useState(null);
+    const [blackKingSquare, setBlackKingSquare] = useState(null);
 
     const ranks = 8;
     const files = 8;
@@ -513,39 +517,73 @@ function GameBoard() {
         }
     }, [selectedPiece])
 
-    //set player's attacking squares
+    //set player's attacking squares and king square
     useEffect(() => {
-        let currentPlayer = playerTurn;
         let attackedSquaresArrWhite = [];
         let attackedSquaresArrBlack = [];
-        let currentPlayerKing;
+        let blackKing;
+        let whiteKing;
 
         for (let i = 0; i < board.length; i++) {
             if (typeof board[i] === "object") {
                 if (board[i].player === 'white') {
                     attackedSquaresArrWhite.push(...handleThisPiece(i))
+                    if (board[i].piece === 'King') {
+                        whiteKing = i;
+                    }
                 }
                 if (board[i].player === 'black') {
                     attackedSquaresArrBlack.push(...handleThisPiece(i))
+                    if (board[i].piece === 'King') {
+                        blackKing = i;
+                    }
                 }
             }
         }
         setSquaresAttackedByBlack(attackedSquaresArrBlack)
         setSquaresAttackedByWhite(attackedSquaresArrWhite)
+        setBlackKingSquare(blackKing);
+        setWhiteKingSquare(whiteKing)
 
     }, [board])
 
-    // log players attacking squares
+    // log players attacking squares, check if player is in check
     useEffect(() => {
-        console.log(`These are the squares attacked by black ${squaresAttackedByBlack}`)
-        console.log(`These are the squares attacked by white ${squaresAttackedByWhite}`)
-    }, [squaresAttackedByBlack, squaresAttackedByWhite])
+        // console.log(`These are the squares attacked by black ${squaresAttackedByBlack}`)
+        // console.log(`These are the squares attacked by white ${squaresAttackedByWhite}`)
+        // console.log(whiteKingSquare)
+        // console.log(blackKingSquare)
 
-    // useEffect(() => {
-    //     if (possibleMoves.length > 0) {
-    //         console.log(possibleMoves)
-    //     }
-    // }, [possibleMoves])
+        //check if white is in check
+        for (let i = 0; i < squaresAttackedByBlack.length; i++) {
+            if (squaresAttackedByBlack[i] === whiteKingSquare) {
+                // console.log('The White King is in Check')
+                setWhiteIsInCheck(true);
+            } else {
+                setWhiteIsInCheck(false);
+            }
+        }
+
+        //check if black is in check
+        console.log(squaresAttackedByWhite)
+        for (let i = 0; i < squaresAttackedByWhite.length; i++) {
+            if (squaresAttackedByWhite[i] === blackKingSquare) {
+                // console.log('The Black King is in Check')
+                setBlackIsInCheck(true);
+            } else {
+                setBlackIsInCheck(false);
+            }
+        }
+    }, [squaresAttackedByBlack, squaresAttackedByWhite, whiteKingSquare, blackKingSquare])
+
+    useEffect(() => {
+        if (blackIsInCheck) {
+            console.log('black is in check')
+        }
+        if (whiteIsInCheck) {
+            console.log('white is in check')
+        }
+    }, [blackIsInCheck, whiteIsInCheck])
 
     return (
         <div className='gameboard'>
