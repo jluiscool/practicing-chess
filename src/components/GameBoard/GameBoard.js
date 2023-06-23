@@ -1,6 +1,9 @@
 import './GameBoard.scss'
+
 import { useEffect, useState } from 'react';
+
 import Square from '../Square/Square';
+const _ = require('lodash');
 
 function GameBoard() {
 
@@ -174,9 +177,15 @@ function GameBoard() {
         }
 
         //apply some logic to the possibleMovesArr if player is in check or will be in check by making this move
+        // let blackPotentialMoves = seeAttackingSquares("black");
         if (piece.player === 'white' && whiteIsInCheck) {
             for (let i = 0; i < possibleMovesArr.length; i++) {
                 console.log(possibleMovesArr[i])
+                // for (let j = 0; j < blackPotentialMoves.length; j++) {
+                //     if (possibleMovesArr[i] === blackPotentialMoves[j]) {
+                //         console.log(possibleMovesArr[i])
+                //     }
+                // }
             }
         }
 
