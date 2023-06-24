@@ -518,25 +518,16 @@ function GameBoard() {
     }
 
     function seeAttackingSquares(attackingPlayer) {
-        let attackedSquaresArrWhite = [];
-        let attackedSquaresArrBlack = [];
+        let attackedSquaresArr = [];
 
         for (let i = 0; i < board.length; i++) {
             if (typeof board[i] === "object") {
-                if (board[i].player === 'white') {
-                    attackedSquaresArrWhite.push(...handleThisPiece(i))
-                }
-                if (board[i].player === 'black') {
-                    attackedSquaresArrBlack.push(...handleThisPiece(i))
+                if (board[i].player === attackingPlayer) {
+                    attackedSquaresArr.push(...handleThisPiece(i))
                 }
             }
         }
-
-        if (attackingPlayer === "white") {
-            return attackedSquaresArrWhite;
-        } else if (attackingPlayer === "black") {
-            return attackedSquaresArrBlack;
-        }
+        return attackedSquaresArr;
     }
 
     //handle clicking on a piece
