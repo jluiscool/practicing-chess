@@ -209,7 +209,6 @@ function GameBoard() {
                 let newBoard = _.cloneDeep(board)
 
                 for (let i = 0; i < possibleMovesArr.length; i++) {
-                    console.log(possibleMovesArr[i])
                     // for (let j = 0; j < blackPotentialMoves.length; j++) {
                     //     if (possibleMovesArr[i] === blackPotentialMoves[j]) {
                     //         console.log(possibleMovesArr[i])
@@ -469,28 +468,28 @@ function GameBoard() {
         }, [board])
 
     const handleThisPiece = useCallback(
-        function handleThisPiece(square) {
+        function handleThisPiece(square, table = board) {
             let potentialMoves = [];
-            if (board[square].piece === 'Pawn') {
-                potentialMoves.push(...pawnMoves(board[square], square));
+            if (table[square].piece === 'Pawn') {
+                potentialMoves.push(...pawnMoves(table[square], square));
             }
-            if (board[square].piece === 'Bishop') {
-                potentialMoves.push(...bishopMoves(board[square], square));
+            if (table[square].piece === 'Bishop') {
+                potentialMoves.push(...bishopMoves(table[square], square));
             }
-            if (board[square].piece === 'Rook') {
-                potentialMoves.push(...rookMoves(board[square], square));
+            if (table[square].piece === 'Rook') {
+                potentialMoves.push(...rookMoves(table[square], square));
             }
-            if (board[square].piece === 'Queen') {
-                potentialMoves.push(...queenMoves(board[square], square));
+            if (table[square].piece === 'Queen') {
+                potentialMoves.push(...queenMoves(table[square], square));
             }
-            if (board[square].piece === 'King') {
-                potentialMoves.push(...kingMoves(board[square], square));
+            if (table[square].piece === 'King') {
+                potentialMoves.push(...kingMoves(table[square], square));
             }
-            if (board[square].piece === 'Knight') {
-                potentialMoves.push(...knightMoves(board[square], square));
+            if (table[square].piece === 'Knight') {
+                potentialMoves.push(...knightMoves(table[square], square));
             }
             return potentialMoves;
-        }, [board, bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves]);
+        }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, board]);
 
     const seeAttackingSquares = useCallback(
         function seeAttackingSquares(attackingPlayer) {
@@ -542,8 +541,6 @@ function GameBoard() {
         }
     }
 
-
-
     //handle clicking on a piece
     useEffect(() => {
         if (selectedPiece !== null) {
@@ -571,9 +568,10 @@ function GameBoard() {
         })
     }, [board])
 
+    //log kings position
     useEffect(() => {
         console.log(`white king: ${whiteKingSquare}, black king ${blackKingSquare}`)
-    }, [blackKingSquare, whiteKingSquare])
+    }, [blackKingSquare, whiteKingSquare, board])
 
     //set player's attacking squares
     useEffect(() => {
@@ -581,12 +579,19 @@ function GameBoard() {
         setSquaresAttackedByWhite(seeAttackingSquares("white"))
     }, [board, seeAttackingSquares])
 
+    //log player's attacking squares
+    useEffect(() => {
+        console.log(`Squares attacked by white: ${squaresAttackedByWhite}`)
+        console.log(`Squares attacked by black: ${squaresAttackedByBlack}`)
+    }, [squaresAttackedByBlack, squaresAttackedByWhite])
+
     //check if player is in check
     useEffect(() => {
         //check if white is in check
         for (let i = 0; i < squaresAttackedByBlack.length; i++) {
             if (squaresAttackedByBlack[i] === whiteKingSquare) {
                 setWhiteIsInCheck(true);
+                return;
             } else {
                 setWhiteIsInCheck(false);
             }
@@ -595,6 +600,7 @@ function GameBoard() {
         for (let i = 0; i < squaresAttackedByWhite.length; i++) {
             if (squaresAttackedByWhite[i] === blackKingSquare) {
                 setBlackIsInCheck(true);
+                return;
             } else {
                 setBlackIsInCheck(false);
             }
