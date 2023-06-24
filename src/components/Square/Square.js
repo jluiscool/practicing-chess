@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import './Square.scss'
 import Bishop from '../Pieces/Bishop';
 import Rook from '../Pieces/Rook';
@@ -8,6 +8,19 @@ import Queen from '../Pieces/Queen';
 import King from '../Pieces/King';
 
 function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possibleMoves, movePiece, isWhiteKingInCheck, isBlackKingInCheck }) {
+
+    const validMove = useCallback(() => {
+        for (let i = 0; i < possibleMoves.length; i++) {
+            if (possibleMoves[i] === id) {
+                return true;
+            }
+        }
+        return false;
+    }, [id, possibleMoves]);
+
+    useEffect(() => {
+        validMove();
+    }, [possibleMoves, validMove]);
 
     const selected = selectedPiece;
 
@@ -29,21 +42,6 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
         }
         return classname;
     }
-
-
-
-    function validMove() {
-        for (let i = 0; i < possibleMoves.length; i++) {
-            if (possibleMoves[i] === id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    useEffect(() => {
-        validMove()
-    }, [possibleMoves])
 
     function renderComponent(component, player) {
         if (component === 'King') {
