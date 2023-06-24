@@ -1,0 +1,88 @@
+Check logic
+
+Example:
+
+Black puts white in check
+
+Whites turn => set possible moves to =>  that none of black’s attacking squares will target the king’s square
+
+
+Piece (1 or more) attacks king: 
+
+Possible moves:
+
+check if King is in check, if it is =>
+
+
+Capture all pieces attacking the king (without putting yourself in check in the process)
+
+Block the attack (or attacks) (without putting yourself in check in the process)
+
+Move King to non-attacked squares
+
+
+
+
+First, make sure that attacking squares for both players are being updated every turn (whether black or whtie) -DONE
+
+
+
+
+Another edge case
+
+
+Select Piece > Set possible moves for piece > SHOULD CHECK IF MOVING PIECE WILL PUT SELF IN CHECK
+
+
+
+Select Piece => When setting possible moves for piece => check possible moves for every enemy piece to see if they’d put you in check. => Then set possible moves to the ones that wouldn’t put you in check
+
+
+
+
+
+
+Logic for moving a piece:
+
+Square (has on click) = > Triggers selectAPiece(id) (which sets the selected Piece in Gameboard)
+				passes movePiece(id)
+
+
+Gameboard movePiece function => takes in the id of the square when clicked,
+if id (SquareToMoveTo) matches any of the possible moves for that piece, it’s a valid square.
+If validsquare is true, and it’s that same player’s turn, update board.
+Then switch turns to other player.
+
+
+Whenever a piece is selected (selectedPiece in Gameboard changes) => set it’s possible moves with the  handleThisPiece function
+
+
+HandleThisPiece(square) function (in Gameboard) => checks what type of piece it is, and applies the appropriate logic, then returns the array of possible moves to the potential moves array.
+
+PawnMoves function (in Gameboard) => gets all the possible moves, then checks if player is in check.
+If player is in check, run logic to filter the array of possible moves.
+
+
+Logic to filter array => possible moves array => if move doesn’t stop check, it’s not a possible move. Else keep that possible move.
+
+
+
+Example:
+
+Black moves bishop => White is in check
+
+White player’s turn => Clicks on pawn => Logic that checks if pawn’s possible moves would stop black from attacking white’s king. (whether that’s capturing a piece, or blocking a piece)
+
+
+Bishop (index = 33 ) attacks squares 42, 51, and 60 (King) 
+
+White is in Check
+
+White clicks on Pawn (index = 50). Only possible move should be 51.
+
+
+How does Pawn know that moving to 50 stops check.
+
+Pawn possible moves 42, 34.
+
+Then run simulation: if Pawn moves to 42 (Run logic that sets a new board to that value, then check if moving to that square would set the attacking squares so that the King is no longer under threat.
