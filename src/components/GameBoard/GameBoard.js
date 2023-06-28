@@ -482,7 +482,6 @@ function GameBoard() {
                     attackedSquaresArr.push(...handleThisPiece(i))
                 }
             }
-            console.log(attackedSquaresArr)
             return attackedSquaresArr;
         }, [board, handleThisPiece])
 
@@ -539,20 +538,28 @@ function GameBoard() {
         return newSimulatedBoard
     }
 
-    const checkIfPlayerIsInCheck = useCallback((player, array) => {
+    const checkIfPlayerIsInCheck = useCallback((player, attackArray, table = board) => {
         let checked = false;
+
         if (player === "white") {
-            for (let i = 0; i < array.length; i++) {
-                if (Number(array[i]) === whiteKingSquare) {
-                    checked = true;
+            for (let i = 0; i < table.length; i++) {
+                if (table[i].piece === "King" && table[i].player === "white") {
+                    for (let j = 0; j < attackArray.length; j++) {
+                        if (i === attackArray[j]) {
+                            checked = true;
+                        }
+                    }
                 }
             }
         }
-
         if (player === "black") {
-            for (let i = 0; i < array.length; i++) {
-                if (Number(array[i]) === blackKingSquare) {
-                    checked = true;
+            for (let i = 0; i < table.length; i++) {
+                if (table[i].piece === "King" && table[i].player === "black") {
+                    for (let j = 0; j < attackArray.length; j++) {
+                        if (i === attackArray[j]) {
+                            checked = true;
+                        }
+                    }
                 }
             }
         }
