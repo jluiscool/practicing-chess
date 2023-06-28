@@ -101,8 +101,6 @@ function GameBoard() {
         ]
     )
 
-    // const [nextMoveBoard, setNextMoveBoard] = useState(null)
-
     function changeColor(index) {
         let color = '';
         if ((index >= 0 && index < 8) || (index >= 16 && index < 24) || (index >= 32 && index < 40) || (index >= 48 && index < 56)) {
@@ -538,6 +536,16 @@ function GameBoard() {
         return newSimulatedBoard
     }
 
+    const findKingSquare = useCallback((player, table = board) => {
+        let foundKingSquare;
+        for (let i = 0; i < table.length; i++) {
+            if (table[i].piece === "King" & table[i].player === player) {
+                foundKingSquare = i;
+            }
+        }
+        return foundKingSquare
+    }, [])
+
     const checkIfPlayerIsInCheck = useCallback((player, attackArray, table = board) => {
         let checked = false;
 
@@ -600,20 +608,8 @@ function GameBoard() {
 
     //set player's king squares
     useEffect(() => {
-        setBlackKingSquare(prev => {
-            for (let i = 0; i < board.length; i++) {
-                if (board[i].piece === "King" & board[i].player === "black") {
-                    return i;
-                }
-            }
-        })
-        setWhiteKingSquare(prev => {
-            for (let i = 0; i < board.length; i++) {
-                if (board[i].piece === "King" & board[i].player === "white") {
-                    return i;
-                }
-            }
-        })
+        setWhiteKingSquare(findKingSquare("white"))
+        setBlackKingSquare(findKingSquare("black"))
     }, [board])
 
     //set player's attacking squares
