@@ -13,8 +13,6 @@ function GameBoard() {
 
     const [possibleMoves, setPossibleMoves] = useState([]);
 
-    // const [allowedMoves, setAllowedMoves] = useState([])
-
     const [whiteIsInCheck, setWhiteIsInCheck] = useState(false);
     const [blackIsInCheck, setBlackIsInCheck] = useState(false);
 
@@ -23,6 +21,9 @@ function GameBoard() {
 
     const [whiteKingSquare, setWhiteKingSquare] = useState(60);
     const [blackKingSquare, setBlackKingSquare] = useState(4);
+
+    // const [whiteIsCheckmated, setWhiteIsCheckmated] = useState(false);
+    // const [blackIsCheckmated, setBlackIsCheckmated] = useState(false);
 
     const ranks = 8;
     // const files = 8;
@@ -161,39 +162,39 @@ function GameBoard() {
     }
 
     const pawnMoves = useCallback(
-        function pawnMoves(piece, index) {
+        function pawnMoves(piece, index, table = board) {
             const possibleMovesArr = [];
             //capture pieces
             if (piece.player === 'white') {
-                if (6 <= index / ranks && index / ranks < 7 && board[index - 8] === "") {
+                if (6 <= index / ranks && index / ranks < 7 && table[index - 8] === "") {
                     possibleMovesArr.push(index - 8);
-                    if (board[index - 16] === "") {
+                    if (table[index - 16] === "") {
                         possibleMovesArr.push(index - 16);
                     }
                 }
-                if (index / ranks < 6 && board[index - 8] === "") {
+                if (index / ranks < 6 && table[index - 8] === "") {
                     possibleMovesArr.push(index - 8);
                 }
-                if (board[index - 7].player === 'black') {
+                if (table[index - 7].player === 'black') {
                     possibleMovesArr.push(index - 7);
                 }
-                if (board[index - 9].player === 'black') {
+                if (table[index - 9].player === 'black') {
                     possibleMovesArr.push(index - 9);
                 }
             }
             if (piece.player === 'black') {
-                if (1 <= index / ranks && index / ranks < 2 && board[index + 8] === "") {
+                if (1 <= index / ranks && index / ranks < 2 && table[index + 8] === "") {
                     possibleMovesArr.push(index + 8);
-                    if (board[index + 16] === "")
+                    if (table[index + 16] === "")
                         possibleMovesArr.push(index + 16);
                 }
-                if (index / ranks > 2 && board[index + 8] === "") {
+                if (index / ranks > 2 && table[index + 8] === "") {
                     possibleMovesArr.push(index + 8);
                 }
-                if (board[index + 7].player === 'white') {
+                if (table[index + 7].player === 'white') {
                     possibleMovesArr.push(index + 7);
                 }
-                if (board[index + 9].player === 'white') {
+                if (table[index + 9].player === 'white') {
                     possibleMovesArr.push(index + 9);
                 }
             }
@@ -201,22 +202,22 @@ function GameBoard() {
         }, [board])
 
     const bishopMoves = useCallback(
-        function bishopMoves(piece, square) {
+        function bishopMoves(piece, square, table = board) {
             const currentPlayer = piece.player;
             const movesArr = [];
 
             //index going down by 7
             for (let i = square - 7; i >= 0; i -= 7) {
                 if (checkRankDiff(i, i + 7, 1)) {
-                    if (board[i]) {
-                        if (board[i].player === currentPlayer) {
+                    if (table[i]) {
+                        if (table[i].player === currentPlayer) {
                             break;
                         }
-                        if (board[i].player !== currentPlayer) {
+                        if (table[i].player !== currentPlayer) {
                             movesArr.push(i);
                             break;
                         }
-                    } else if (!board[i]) {
+                    } else if (!table[i]) {
                         movesArr.push(i);
                     }
                 } else {
@@ -226,15 +227,15 @@ function GameBoard() {
             //index going down by 9
             for (let i = square - 9; i >= 0; i -= 9) {
                 if (checkRankDiff(i, i + 9, 1)) {
-                    if (board[i]) {
-                        if (board[i].player === currentPlayer) {
+                    if (table[i]) {
+                        if (table[i].player === currentPlayer) {
                             break;
                         }
-                        if (board[i].player !== currentPlayer) {
+                        if (table[i].player !== currentPlayer) {
                             movesArr.push(i);
                             break;
                         }
-                    } else if (!board[i]) {
+                    } else if (!table[i]) {
                         movesArr.push(i);
                     }
                 } else {
@@ -245,15 +246,15 @@ function GameBoard() {
             //index going up by 7
             for (let i = square + 7; i < 64; i += 7) {
                 if (checkRankDiff(i, i - 7, 1)) {
-                    if (board[i]) {
-                        if (board[i].player === currentPlayer) {
+                    if (table[i]) {
+                        if (table[i].player === currentPlayer) {
                             break;
                         }
-                        if (board[i].player !== currentPlayer) {
+                        if (table[i].player !== currentPlayer) {
                             movesArr.push(i);
                             break;
                         }
-                    } else if (!board[i]) {
+                    } else if (!table[i]) {
                         movesArr.push(i);
                     }
                 } else {
@@ -264,15 +265,15 @@ function GameBoard() {
             //index going up by 9
             for (let i = square + 9; i < 64; i += 9) {
                 if (checkRankDiff(i, i - 9, 1)) {
-                    if (board[i]) {
-                        if (board[i].player === currentPlayer) {
+                    if (table[i]) {
+                        if (table[i].player === currentPlayer) {
                             break;
                         }
-                        if (board[i].player !== currentPlayer) {
+                        if (table[i].player !== currentPlayer) {
                             movesArr.push(i);
                             break;
                         }
-                    } else if (!board[i]) {
+                    } else if (!table[i]) {
                         movesArr.push(i);
                     }
                 } else {
@@ -284,7 +285,7 @@ function GameBoard() {
         }, [board, checkRankDiff])
 
     const rookMoves = useCallback(
-        function rookMoves(piece, square) {
+        function rookMoves(piece, square, table = board) {
             const currentPlayer = piece.player;
             const movesArr = [];
             let pieceRank = findSquareRank(square)
@@ -292,32 +293,32 @@ function GameBoard() {
 
             //going right
             for (let i = square + 1; findSquareRank(i) === pieceRank; i++) {
-                if (board[i]) {
-                    if (board[i].player === currentPlayer) {
+                if (table[i]) {
+                    if (table[i].player === currentPlayer) {
                         break;
                     }
-                    if (board[i].player !== currentPlayer) {
+                    if (table[i].player !== currentPlayer) {
                         movesArr.push(i);
                         break;
                     }
-                } else if (!board[i]) {
+                } else if (!table[i]) {
                     movesArr.push(i);
                 }
             }
 
             //going left
             for (let i = square - 1; findSquareRank(i) === pieceRank; i--) {
-                if (board[i]) {
-                    if (board[i].player === currentPlayer) {
+                if (table[i]) {
+                    if (table[i].player === currentPlayer) {
                         break;
                     }
-                    if (board[i].player !== currentPlayer) {
+                    if (table[i].player !== currentPlayer) {
                         movesArr.push(i);
                         break;
                     }
                 } else if (i < 0) {
                     break;
-                } else if (!board[i]) {
+                } else if (!table[i]) {
                     movesArr.push(i);
                 }
             }
@@ -325,15 +326,15 @@ function GameBoard() {
             //going up
             for (let i = square - 8; i >= 0; i -= 8) {
                 if (checkNewFileDiff(i + 8, i, 0)) {
-                    if (board[i]) {
-                        if (board[i].player === currentPlayer) {
+                    if (table[i]) {
+                        if (table[i].player === currentPlayer) {
                             break;
                         }
-                        if (board[i].player !== currentPlayer) {
+                        if (table[i].player !== currentPlayer) {
                             movesArr.push(i);
                             break;
                         }
-                    } else if (!board[i]) {
+                    } else if (!table[i]) {
                         movesArr.push(i);
                     }
                 }
@@ -341,15 +342,15 @@ function GameBoard() {
             //going down
             for (let i = square + 8; i < 64; i += 8) {
                 if (checkNewFileDiff(i - 8, i, 0)) {
-                    if (board[i]) {
-                        if (board[i].player === currentPlayer) {
+                    if (table[i]) {
+                        if (table[i].player === currentPlayer) {
                             break;
                         }
-                        if (board[i].player !== currentPlayer) {
+                        if (table[i].player !== currentPlayer) {
                             movesArr.push(i);
                             break;
                         }
-                    } else if (!board[i]) {
+                    } else if (!table[i]) {
                         movesArr.push(i);
                     }
                 }
@@ -358,17 +359,17 @@ function GameBoard() {
         }, [board])
 
     const queenMoves = useCallback(
-        function queenMoves(piece, square) {
+        function queenMoves(piece, square, table = board) {
             let movesArr = [];
-            let crossMoves = rookMoves(piece, square)
-            let diaMoves = bishopMoves(piece, square)
+            let crossMoves = rookMoves(piece, square, table)
+            let diaMoves = bishopMoves(piece, square, table)
             movesArr = [...crossMoves, ...diaMoves];
 
             return movesArr;
-        }, [rookMoves, bishopMoves])
+        }, [rookMoves, bishopMoves, board])
 
     const kingMoves = useCallback(
-        function kingMoves(piece, square) {
+        function kingMoves(piece, square, table = board) {
             let movesArr = [];
             let currentPlayer = piece.player;
             let rightMove = square + 1;
@@ -376,30 +377,30 @@ function GameBoard() {
 
             // going down
             for (let i = square + 7; i < square + 10 && i < 64; i++) {
-                if (board[i]) {
-                    if (board[i].player !== currentPlayer) {
+                if (table[i]) {
+                    if (table[i].player !== currentPlayer) {
                         movesArr.push(i);
                     }
-                } else if (!board[i]) {
+                } else if (!table[i]) {
                     movesArr.push(i);
                 }
             }
             //going up
             for (let i = square - 7; i > square - 10 && i >= 0; i--) {
-                if (board[i]) {
-                    if (board[i].player !== currentPlayer) {
+                if (table[i]) {
+                    if (table[i].player !== currentPlayer) {
                         movesArr.push(i);
                     }
-                } else if (!board[i]) {
+                } else if (!table[i]) {
                     movesArr.push(i);
                 }
             }
             // right
-            if (board[rightMove].player !== currentPlayer) {
+            if (table[rightMove].player !== currentPlayer) {
                 movesArr.push(rightMove);
             }
             // left
-            if (board[leftMove].player !== currentPlayer) {
+            if (table[leftMove].player !== currentPlayer) {
                 movesArr.push(leftMove);
             }
             return movesArr;
@@ -407,7 +408,7 @@ function GameBoard() {
         , [board])
 
     const knightMoves = useCallback(
-        function knightMoves(piece, square) {
+        function knightMoves(piece, square, table = board) {
             let movesArr = [];
             let currentPlayer = piece.player;
             let topRight = square - 15;
@@ -419,28 +420,28 @@ function GameBoard() {
             let leftTop = square - 10;
             let topLeft = square - 17;
 
-            if (board[topRight] !== undefined && board[topRight].player !== currentPlayer && topRight < 64 && topRight >= 0 && checkNewFileDiff(topRight, square, 1)) {
+            if (table[topRight] !== undefined && table[topRight].player !== currentPlayer && topRight < 64 && topRight >= 0 && checkNewFileDiff(topRight, square, 1)) {
                 movesArr.push(topRight)
             }
-            if (board[rightTop] !== undefined && board[rightTop].player !== currentPlayer && rightTop < 64 && rightTop >= 0 && checkNewFileDiff(rightTop, square, 2)) {
+            if (table[rightTop] !== undefined && table[rightTop].player !== currentPlayer && rightTop < 64 && rightTop >= 0 && checkNewFileDiff(rightTop, square, 2)) {
                 movesArr.push(rightTop)
             }
-            if (board[rightBottom] !== undefined && board[rightBottom].player !== currentPlayer && rightBottom < 64 && rightBottom >= 0 && checkNewFileDiff(rightBottom, square, 2)) {
+            if (table[rightBottom] !== undefined && table[rightBottom].player !== currentPlayer && rightBottom < 64 && rightBottom >= 0 && checkNewFileDiff(rightBottom, square, 2)) {
                 movesArr.push(rightBottom)
             }
-            if (board[bottomRight] !== undefined && board[bottomRight].player !== currentPlayer && bottomRight < 64 && bottomRight >= 0 && checkNewFileDiff(bottomRight, square, 1)) {
+            if (table[bottomRight] !== undefined && table[bottomRight].player !== currentPlayer && bottomRight < 64 && bottomRight >= 0 && checkNewFileDiff(bottomRight, square, 1)) {
                 movesArr.push(bottomRight)
             }
-            if (board[bottomLeft] !== undefined && board[bottomLeft].player !== currentPlayer && bottomLeft < 64 && bottomLeft >= 0 && checkNewFileDiff(bottomLeft, square, 1)) {
+            if (table[bottomLeft] !== undefined && table[bottomLeft].player !== currentPlayer && bottomLeft < 64 && bottomLeft >= 0 && checkNewFileDiff(bottomLeft, square, 1)) {
                 movesArr.push(bottomLeft)
             }
-            if (board[leftBottom] !== undefined && board[leftBottom].player !== currentPlayer && leftBottom < 64 && leftBottom >= 0 && checkNewFileDiff(leftBottom, square, 2)) {
+            if (table[leftBottom] !== undefined && table[leftBottom].player !== currentPlayer && leftBottom < 64 && leftBottom >= 0 && checkNewFileDiff(leftBottom, square, 2)) {
                 movesArr.push(leftBottom)
             }
-            if (board[leftTop] !== undefined && board[leftTop].player !== currentPlayer && leftTop < 64 && leftTop >= 0 && checkNewFileDiff(leftTop, square, 2)) {
+            if (table[leftTop] !== undefined && table[leftTop].player !== currentPlayer && leftTop < 64 && leftTop >= 0 && checkNewFileDiff(leftTop, square, 2)) {
                 movesArr.push(leftTop)
             }
-            if (board[topLeft] !== undefined && board[topLeft].player !== currentPlayer && topLeft < 64 && topLeft >= 0 && checkNewFileDiff(topLeft, square, 1)) {
+            if (table[topLeft] !== undefined && table[topLeft].player !== currentPlayer && topLeft < 64 && topLeft >= 0 && checkNewFileDiff(topLeft, square, 1)) {
                 movesArr.push(topLeft)
             }
 
@@ -451,22 +452,22 @@ function GameBoard() {
         function handleThisPiece(square, table = board) {
             let potentialMoves = [];
             if (table[square].piece === 'Pawn') {
-                potentialMoves.push(...pawnMoves(table[square], square));
+                potentialMoves.push(...pawnMoves(table[square], square, table));
             }
             if (table[square].piece === 'Bishop') {
-                potentialMoves.push(...bishopMoves(table[square], square));
+                potentialMoves.push(...bishopMoves(table[square], square, table));
             }
             if (table[square].piece === 'Rook') {
-                potentialMoves.push(...rookMoves(table[square], square));
+                potentialMoves.push(...rookMoves(table[square], square, table));
             }
             if (table[square].piece === 'Queen') {
-                potentialMoves.push(...queenMoves(table[square], square));
+                potentialMoves.push(...queenMoves(table[square], square, table));
             }
             if (table[square].piece === 'King') {
-                potentialMoves.push(...kingMoves(table[square], square));
+                potentialMoves.push(...kingMoves(table[square], square, table));
             }
             if (table[square].piece === 'Knight') {
-                potentialMoves.push(...knightMoves(table[square], square));
+                potentialMoves.push(...knightMoves(table[square], square, table));
             }
             return potentialMoves;
         }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, board]);
@@ -477,7 +478,7 @@ function GameBoard() {
 
             for (let i = 0; i < table.length; i++) {
                 if (typeof table[i] === "object" && table[i].player === attackingPlayer) {
-                    attackedSquaresArr.push(...handleThisPiece(i))
+                    attackedSquaresArr.push(...handleThisPiece(i, table))
                 }
             }
             return attackedSquaresArr;
@@ -520,7 +521,7 @@ function GameBoard() {
     }
 
     // returns a board in an array with the simulated move
-    function changeNextMoveBoard(squareToMoveTo) {
+    const changeNextMoveBoard = useCallback((squareToMoveTo) => {
         let simulatedBoard = _.cloneDeep(board);
         let newSimulatedBoard = simulatedBoard.map((square, index) => {
             if (index === squareToMoveTo) {
@@ -534,7 +535,7 @@ function GameBoard() {
             }
         })
         return newSimulatedBoard
-    }
+    }, [board, selectedPiece])
 
     const findKingSquare = useCallback((player, table = board) => {
         let foundKingSquare;
@@ -544,36 +545,21 @@ function GameBoard() {
             }
         }
         return foundKingSquare
-    }, [])
+    }, [board])
 
     const checkIfPlayerIsInCheck = useCallback((player, attackArray, table = board) => {
         let checked = false;
 
-        if (player === "white") {
-            for (let i = 0; i < table.length; i++) {
-                if (table[i].piece === "King" && table[i].player === "white") {
-                    for (let j = 0; j < attackArray.length; j++) {
-                        if (i === attackArray[j]) {
-                            checked = true;
-                        }
-                    }
-                }
-            }
-        }
-        if (player === "black") {
-            for (let i = 0; i < table.length; i++) {
-                if (table[i].piece === "King" && table[i].player === "black") {
-                    for (let j = 0; j < attackArray.length; j++) {
-                        if (i === attackArray[j]) {
-                            checked = true;
-                        }
-                    }
-                }
+        let kingSquare = findKingSquare(player, table)
+
+        for (let i = 0; i < attackArray.length; i++) {
+            if (kingSquare === attackArray[i]) {
+                checked = true;
             }
         }
 
         return checked;
-    }, [whiteKingSquare, blackKingSquare]);
+    }, [board, findKingSquare]);
 
     //handle clicking on a piece
     useEffect(() => {
@@ -604,13 +590,13 @@ function GameBoard() {
         } else {
             setPossibleMoves([])
         }
-    }, [selectedPiece, handleThisPiece])
+    }, [selectedPiece, handleThisPiece, board, changeNextMoveBoard, seeAttackingSquares, checkIfPlayerIsInCheck])
 
     //set player's king squares
     useEffect(() => {
         setWhiteKingSquare(findKingSquare("white"))
         setBlackKingSquare(findKingSquare("black"))
-    }, [board])
+    }, [board, findKingSquare])
 
     //set player's attacking squares
     useEffect(() => {
@@ -624,11 +610,6 @@ function GameBoard() {
         setWhiteIsInCheck(checkIfPlayerIsInCheck("white", squaresAttackedByBlack))
         setBlackIsInCheck(checkIfPlayerIsInCheck("black", squaresAttackedByWhite))
     }, [squaresAttackedByBlack, squaresAttackedByWhite, checkIfPlayerIsInCheck, board])
-
-    //update nextMoveBoard
-    // useEffect(() => {
-    //     setNextMoveBoard([...board])
-    // }, [board])
 
     useEffect(() => {
         if (whiteIsInCheck) {
@@ -657,7 +638,7 @@ function GameBoard() {
                             possibleMoves={possibleMoves}
                             movePiece={movePiece}
                             isWhiteKingInCheck={whiteIsInCheck ? whiteKingSquare : false}
-                            isBlackKingInCheck={blackIsInCheck ? whiteKingSquare : false}
+                            isBlackKingInCheck={blackIsInCheck ? blackKingSquare : false}
                         />
                     )
                 })
