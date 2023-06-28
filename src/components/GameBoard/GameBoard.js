@@ -3,7 +3,7 @@ import './GameBoard.scss'
 import { useEffect, useState, useCallback } from 'react';
 
 import Square from '../Square/Square';
-// const _ = require('lodash');
+const _ = require('lodash');
 
 function GameBoard() {
 
@@ -13,7 +13,7 @@ function GameBoard() {
 
     const [possibleMoves, setPossibleMoves] = useState([]);
 
-    const [allowedMoves, setAllowedMoves] = useState([])
+    // const [allowedMoves, setAllowedMoves] = useState([])
 
     const [whiteIsInCheck, setWhiteIsInCheck] = useState(false);
     const [blackIsInCheck, setBlackIsInCheck] = useState(false);
@@ -101,7 +101,7 @@ function GameBoard() {
         ]
     )
 
-    const [nextMoveBoard, setNextMoveBoard] = useState(null)
+    // const [nextMoveBoard, setNextMoveBoard] = useState(null)
 
     function changeColor(index) {
         let color = '';
@@ -474,20 +474,19 @@ function GameBoard() {
         }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, board]);
 
     const seeAttackingSquares = useCallback(
-        function seeAttackingSquares(attackingPlayer) {
+        function seeAttackingSquares(attackingPlayer, table = board) {
             let attackedSquaresArr = [];
 
-            for (let i = 0; i < board.length; i++) {
-                if (typeof board[i] === "object") {
-                    if (board[i].player === attackingPlayer) {
-                        attackedSquaresArr.push(...handleThisPiece(i))
-                    }
+            for (let i = 0; i < table.length; i++) {
+                if (typeof table[i] === "object" && table[i].player === attackingPlayer) {
+                    attackedSquaresArr.push(...handleThisPiece(i))
                 }
             }
+            console.log(attackedSquaresArr)
             return attackedSquaresArr;
         }, [board, handleThisPiece])
 
-    function movePiece(squareToMoveTo) {
+    function movePiece(squareToMoveTo, table = board) {
         let validSquare;
         if (typeof selectedPiece === 'number' && possibleMoves.length > 0) {
             for (let i = 0; i < possibleMoves.length; i++) {
@@ -497,11 +496,11 @@ function GameBoard() {
         } else {
             return;
         }
-        if (typeof validSquare === 'number' && playerTurn === board[selectedPiece].player) {
+        if (typeof validSquare === 'number' && playerTurn === table[selectedPiece].player && table === board) {
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
                     if (index === validSquare) {
-                        square = board[selectedPiece];
+                        square = table[selectedPiece];
                         return square;
                     } else if (index === selectedPiece) {
                         square = "";
@@ -523,11 +522,26 @@ function GameBoard() {
         }
     }
 
+    // returns a board in an array with the simulated move
+    function changeNextMoveBoard(squareToMoveTo) {
+        let simulatedBoard = _.cloneDeep(board);
+        let newSimulatedBoard = simulatedBoard.map((square, index) => {
+            if (index === squareToMoveTo) {
+                square = simulatedBoard[selectedPiece]
+                return square;
+            } else if (index === selectedPiece) {
+                square = "";
+                return square;
+            } else {
+                return square;
+            }
+        })
+        return newSimulatedBoard
+    }
+
     const checkIfPlayerIsInCheck = useCallback((player, array) => {
         let checked = false;
         if (player === "white") {
-            console.log(whiteKingSquare);
-            console.log(array);
             for (let i = 0; i < array.length; i++) {
                 if (Number(array[i]) === whiteKingSquare) {
                     checked = true;
@@ -546,17 +560,27 @@ function GameBoard() {
         return checked;
     }, [whiteKingSquare, blackKingSquare]);
 
-    console.log(checkIfPlayerIsInCheck("white", [60]))
-
-
-    function changeNextMoveBoard(id) {
-
-    }
-
     //handle clicking on a piece
     useEffect(() => {
         if (selectedPiece !== null) {
+            let oppPlayer = ""
+            if (board[selectedPiece].player === "white") {
+                oppPlayer = "black"
+            } else if (board[selectedPiece].player === "black") {
+                oppPlayer = "white"
+            }
+            console.log(oppPlayer)
+            //you get back array
             let newPossibleMoves = handleThisPiece(selectedPiece);
+            let newAllowedMoves = []
+            //now send every element in array to simulation and check if king is still in check, if king is in check, return true? else return false
+            for (let i = 0; i < newPossibleMoves.length; i++) {
+                // returns new board
+                let testBoard = changeNextMoveBoard(newPossibleMoves[i]);
+                // returns array of squares being attacked by player
+                let futureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
+                // console.log(`if ${board[selectedPiece].player} moves ${selectedPiece} to ${newPossibleMoves[i]}, then ${oppPlayer} can move to ${futureAttackingMoves}`)
+            }
             setPossibleMoves(newPossibleMoves);
         } else {
             setPossibleMoves([])
@@ -590,24 +614,23 @@ function GameBoard() {
     //check if player is in check
     useEffect(() => {
         //check if white is in check
-        console.log('this use effect is running')
         setWhiteIsInCheck(checkIfPlayerIsInCheck("white", squaresAttackedByBlack))
         setBlackIsInCheck(checkIfPlayerIsInCheck("black", squaresAttackedByWhite))
     }, [squaresAttackedByBlack, squaresAttackedByWhite, checkIfPlayerIsInCheck, board])
 
     //update nextMoveBoard
-    useEffect(() => {
-        setNextMoveBoard([...board])
-    }, [board])
+    // useEffect(() => {
+    //     setNextMoveBoard([...board])
+    // }, [board])
 
     useEffect(() => {
         if (whiteIsInCheck) {
             console.log('white is in check')
-        }
-        if (blackIsInCheck) {
+            return;
+        } else if (blackIsInCheck) {
             console.log('black is in check')
-        }
-        else {
+            return;
+        } else {
             console.log('no one is in check')
         }
     }, [whiteIsInCheck, blackIsInCheck, board])
