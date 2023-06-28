@@ -3,7 +3,7 @@ import './GameBoard.scss'
 import { useEffect, useState, useCallback } from 'react';
 
 import Square from '../Square/Square';
-const _ = require('lodash');
+// const _ = require('lodash');
 
 function GameBoard() {
 
@@ -13,15 +13,16 @@ function GameBoard() {
 
     const [possibleMoves, setPossibleMoves] = useState([]);
 
+    const [allowedMoves, setAllowedMoves] = useState([])
+
     const [whiteIsInCheck, setWhiteIsInCheck] = useState(false);
     const [blackIsInCheck, setBlackIsInCheck] = useState(false);
 
     const [squaresAttackedByWhite, setSquaresAttackedByWhite] = useState([]);
-
     const [squaresAttackedByBlack, setSquaresAttackedByBlack] = useState([]);
 
-    const [whiteKingSquare, setWhiteKingSquare] = useState(null);
-    const [blackKingSquare, setBlackKingSquare] = useState(null);
+    const [whiteKingSquare, setWhiteKingSquare] = useState(60);
+    const [blackKingSquare, setBlackKingSquare] = useState(4);
 
     const ranks = 8;
     // const files = 8;
@@ -100,6 +101,8 @@ function GameBoard() {
         ]
     )
 
+    const [nextMoveBoard, setNextMoveBoard] = useState(null)
+
     function changeColor(index) {
         let color = '';
         if ((index >= 0 && index < 8) || (index >= 16 && index < 24) || (index >= 32 && index < 40) || (index >= 48 && index < 56)) {
@@ -134,11 +137,6 @@ function GameBoard() {
         return rank;
     }
 
-    // function findSquareFile(index) {
-    //     let file = Math.trunc((index / files));
-    //     return file;
-    // }
-
     const checkRankDiff = useCallback(
         function checkRankDiff(newSquare, prevSquare, rankDiff) {
             let diff = Math.abs(findSquareRank(newSquare) - findSquareRank(prevSquare))
@@ -150,7 +148,6 @@ function GameBoard() {
         }, [])
 
     function checkNewFileDiff(newSquare, currSquare, fileDiff) {
-
         let currSquareFile = (currSquare / 8) % 1;
         let newSquareFile = (newSquare / 8) % 1
 
@@ -202,23 +199,8 @@ function GameBoard() {
                     possibleMovesArr.push(index + 9);
                 }
             }
-
-            //apply some logic to the possibleMovesArr if player is in check or will be in check by making this move
-            // let blackPotentialMoves = seeAttackingSquares("black");
-            if (piece.player === 'white' && whiteIsInCheck) {
-                let newBoard = _.cloneDeep(board)
-
-                for (let i = 0; i < possibleMovesArr.length; i++) {
-                    // for (let j = 0; j < blackPotentialMoves.length; j++) {
-                    //     if (possibleMovesArr[i] === blackPotentialMoves[j]) {
-                    //         console.log(possibleMovesArr[i])
-                    //     }
-                    // }
-                }
-            }
-
             return possibleMovesArr;
-        }, [board, whiteIsInCheck])
+        }, [board])
 
     const bishopMoves = useCallback(
         function bishopMoves(piece, square) {
@@ -541,10 +523,41 @@ function GameBoard() {
         }
     }
 
+    const checkIfPlayerIsInCheck = useCallback((player, array) => {
+        let checked = false;
+        if (player === "white") {
+            console.log(whiteKingSquare);
+            console.log(array);
+            for (let i = 0; i < array.length; i++) {
+                if (Number(array[i]) === whiteKingSquare) {
+                    checked = true;
+                }
+            }
+        }
+
+        if (player === "black") {
+            for (let i = 0; i < array.length; i++) {
+                if (Number(array[i]) === blackKingSquare) {
+                    checked = true;
+                }
+            }
+        }
+
+        return checked;
+    }, [whiteKingSquare, blackKingSquare]);
+
+    console.log(checkIfPlayerIsInCheck("white", [60]))
+
+
+    function changeNextMoveBoard(id) {
+
+    }
+
     //handle clicking on a piece
     useEffect(() => {
         if (selectedPiece !== null) {
-            setPossibleMoves(handleThisPiece(selectedPiece));
+            let newPossibleMoves = handleThisPiece(selectedPiece);
+            setPossibleMoves(newPossibleMoves);
         } else {
             setPossibleMoves([])
         }
@@ -568,56 +581,36 @@ function GameBoard() {
         })
     }, [board])
 
-    //log kings position
-    useEffect(() => {
-        console.log(`white king: ${whiteKingSquare}, black king ${blackKingSquare}`)
-    }, [blackKingSquare, whiteKingSquare, board])
-
     //set player's attacking squares
     useEffect(() => {
         setSquaresAttackedByBlack(seeAttackingSquares("black"))
         setSquaresAttackedByWhite(seeAttackingSquares("white"))
     }, [board, seeAttackingSquares])
 
-    //log player's attacking squares
-    useEffect(() => {
-        console.log(`Squares attacked by white: ${squaresAttackedByWhite}`)
-        console.log(`Squares attacked by black: ${squaresAttackedByBlack}`)
-    }, [squaresAttackedByBlack, squaresAttackedByWhite])
-
     //check if player is in check
     useEffect(() => {
         //check if white is in check
-        for (let i = 0; i < squaresAttackedByBlack.length; i++) {
-            if (squaresAttackedByBlack[i] === whiteKingSquare) {
-                setWhiteIsInCheck(true);
-                return;
-            } else {
-                setWhiteIsInCheck(false);
-            }
-        }
+        console.log('this use effect is running')
+        setWhiteIsInCheck(checkIfPlayerIsInCheck("white", squaresAttackedByBlack))
+        setBlackIsInCheck(checkIfPlayerIsInCheck("black", squaresAttackedByWhite))
+    }, [squaresAttackedByBlack, squaresAttackedByWhite, checkIfPlayerIsInCheck, board])
 
-        for (let i = 0; i < squaresAttackedByWhite.length; i++) {
-            if (squaresAttackedByWhite[i] === blackKingSquare) {
-                setBlackIsInCheck(true);
-                return;
-            } else {
-                setBlackIsInCheck(false);
-            }
-        }
-    }, [squaresAttackedByBlack, squaresAttackedByWhite, whiteKingSquare, blackKingSquare, board])
-
-    //log if player is in check
+    //update nextMoveBoard
     useEffect(() => {
+        setNextMoveBoard([...board])
+    }, [board])
+
+    useEffect(() => {
+        if (whiteIsInCheck) {
+            console.log('white is in check')
+        }
         if (blackIsInCheck) {
             console.log('black is in check')
         }
-        if (whiteIsInCheck) {
-            console.log('white is in check')
-        } else {
-            console.log('white is no longer in check');
+        else {
+            console.log('no one is in check')
         }
-    }, [blackIsInCheck, whiteIsInCheck, board])
+    }, [whiteIsInCheck, blackIsInCheck, board])
 
     return (
         <div className='gameboard'>
