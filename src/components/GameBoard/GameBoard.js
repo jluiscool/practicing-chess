@@ -576,7 +576,6 @@ function GameBoard() {
             } else if (board[selectedPiece].player === "black") {
                 oppPlayer = "white"
             }
-            console.log(oppPlayer)
             //you get back array
             let newPossibleMoves = handleThisPiece(selectedPiece);
             let newAllowedMoves = []
@@ -587,8 +586,13 @@ function GameBoard() {
                 // returns array of squares being attacked by player
                 let futureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
                 // console.log(`if ${board[selectedPiece].player} moves ${selectedPiece} to ${newPossibleMoves[i]}, then ${oppPlayer} can move to ${futureAttackingMoves}`)
+                if (checkIfPlayerIsInCheck(board[selectedPiece].player, futureAttackingMoves, testBoard)) {
+                    console.log(`This move: ${newPossibleMoves[i]} will put you in check`)
+                } else {
+                    newAllowedMoves.push(newPossibleMoves[i])
+                }
             }
-            setPossibleMoves(newPossibleMoves);
+            setPossibleMoves(newAllowedMoves);
         } else {
             setPossibleMoves([])
         }
