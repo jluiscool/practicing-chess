@@ -180,10 +180,10 @@ function GameBoard() {
                 if (index / ranks < 6 && table[index - 8] === "") {
                     possibleMovesArr.push(index - 8);
                 }
-                if (typeof table[index - 7] === "object" && table[index - 7].player === 'black') {
+                if (typeof table[index - 7] === "object" && table[index - 7].player === 'black' && checkNewFileDiff(index - 7, index, 1)) {
                     possibleMovesArr.push(index - 7);
                 }
-                if (typeof table[index - 9] === "object" && table[index - 9].player === 'black') {
+                if (typeof table[index - 9] === "object" && table[index - 9].player === 'black' && checkNewFileDiff(index - 9, index, 1)) {
                     possibleMovesArr.push(index - 9);
                 }
             }
@@ -196,10 +196,10 @@ function GameBoard() {
                 if (index / ranks > 2 && table[index + 8] === "") {
                     possibleMovesArr.push(index + 8);
                 }
-                if (typeof table[index + 7] === "object" && table[index + 7].player === 'white') {
+                if (typeof table[index + 7] === "object" && table[index + 7].player === 'white' && checkNewFileDiff(index + 7, index, 1)) {
                     possibleMovesArr.push(index + 7);
                 }
-                if (typeof table[index + 9] === "object" && table[index + 9].player === 'white') {
+                if (typeof table[index + 9] === "object" && table[index + 9].player === 'white' && checkNewFileDiff(index + 9, index, 1)) {
                     possibleMovesArr.push(index + 9);
                 }
             }
