@@ -175,10 +175,10 @@ function GameBoard() {
                 if (index / ranks < 6 && table[index - 8] === "") {
                     possibleMovesArr.push(index - 8);
                 }
-                if (table[index - 7].player === 'black') {
+                if (typeof table[index - 9] === "object" && table[index - 7].player === 'black') {
                     possibleMovesArr.push(index - 7);
                 }
-                if (table[index - 9].player === 'black') {
+                if (typeof table[index - 9] === "object" && table[index - 9].player === 'black') {
                     possibleMovesArr.push(index - 9);
                 }
             }
@@ -191,10 +191,10 @@ function GameBoard() {
                 if (index / ranks > 2 && table[index + 8] === "") {
                     possibleMovesArr.push(index + 8);
                 }
-                if (typeof table[index+9] === "object" && table[index + 7].player === 'white') {
+                if (typeof table[index - 9] === "object" && typeof table[index + 9] === "object" && table[index + 7].player === 'white') {
                     possibleMovesArr.push(index + 7);
                 }
-                if (typeof table[index+9] === "object" && table[index + 9].player === 'white') {
+                if (typeof table[index - 9] === "object" && typeof table[index + 9] === "object" && table[index + 9].player === 'white') {
                     possibleMovesArr.push(index + 9);
                 }
             }
@@ -561,36 +561,65 @@ function GameBoard() {
         return checked;
     }, [board, findKingSquare]);
 
+    const findAllPlayerPieces = useCallback((player, table = board) => {
+        let playerPieces = []
+        for (let i = 0; i < table.length; i++) {
+            if (typeof table[i] === "object" && table[i].player === player) {
+                playerPieces.push(i);
+            }
+        }
+    }, [board])
+
+    const findOppPlayer = useCallback((player) => {
+        if (player === "white") {
+            return "black"
+        } else if (player === "black") {
+            return "white"
+        }
+    }, [])
+
+    const findLegalMoves = useCallback((movesArr, oppPlayer) => {
+        let filteredMoves = []
+        for (let i = 0; i < movesArr.length; i++) {
+            // returns new board
+            let testBoard = changeNextMoveBoard(movesArr[i]);
+            // returns array of squares being attacked by player
+            let oppFutureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
+            console.log(`if ${board[selectedPiece] ? board[selectedPiece].piece : ""} moves to ${movesArr[i]}, these will be the opponents attacking squares ${oppFutureAttackingMoves}`)
+            if (checkIfPlayerIsInCheck(findOppPlayer(oppPlayer), oppFutureAttackingMoves, testBoard)) {
+                console.log(`This move: ${movesArr[i]} will put you in check`)
+            } else {
+                filteredMoves.push(movesArr[i])
+            }
+        }
+        return filteredMoves;
+    }, [board, changeNextMoveBoard, checkIfPlayerIsInCheck, findOppPlayer, seeAttackingSquares, selectedPiece])
+
+    const findEveryLegalMove = useCallback((playerPiecesArr, oppPlayer) => {
+        let everyLegalMove = []
+        for (let j = 0; j < playerPiecesArr.length; j++) {
+            let piecePossibleMoves = handleThisPiece(playerPiecesArr[j], board);
+            everyLegalMove.push(findLegalMoves(piecePossibleMoves, oppPlayer))
+        }
+        console.log(everyLegalMove)
+        return everyLegalMove
+    }, [board, findLegalMoves, handleThisPiece])
+
+
+
     //handle clicking on a piece
     useEffect(() => {
         if (selectedPiece !== null) {
-            let oppPlayer = ""
-            if (board[selectedPiece].player === "white") {
-                oppPlayer = "black"
-            } else if (board[selectedPiece].player === "black") {
-                oppPlayer = "white"
-            }
+            let oppPlayer = findOppPlayer(board[selectedPiece].player)
             //you get back array
             let newPossibleMoves = handleThisPiece(selectedPiece);
-            let newAllowedMoves = []
-            //now send every element in array to simulation and check if king is still in check, if king is in check, return true? else return false
-            for (let i = 0; i < newPossibleMoves.length; i++) {
-                // returns new board
-                let testBoard = changeNextMoveBoard(newPossibleMoves[i]);
-                // returns array of squares being attacked by player
-                let futureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
-                // console.log(`if ${board[selectedPiece].player} moves ${selectedPiece} to ${newPossibleMoves[i]}, then ${oppPlayer} can move to ${futureAttackingMoves}`)
-                if (checkIfPlayerIsInCheck(board[selectedPiece].player, futureAttackingMoves, testBoard)) {
-                    console.log(`This move: ${newPossibleMoves[i]} will put you in check`)
-                } else {
-                    newAllowedMoves.push(newPossibleMoves[i])
-                }
-            }
-            setPossibleMoves(newAllowedMoves);
+            let legalMoves = findLegalMoves(newPossibleMoves, oppPlayer)
+            console.log(legalMoves)
+            setPossibleMoves(legalMoves);
         } else {
             setPossibleMoves([])
         }
-    }, [selectedPiece, handleThisPiece, board, changeNextMoveBoard, seeAttackingSquares, checkIfPlayerIsInCheck])
+    }, [selectedPiece, handleThisPiece, board, changeNextMoveBoard, seeAttackingSquares, checkIfPlayerIsInCheck, findLegalMoves, findOppPlayer])
 
     //set player's king squares
     useEffect(() => {
@@ -623,47 +652,43 @@ function GameBoard() {
         }
     }, [whiteIsInCheck, blackIsInCheck, board])
 
-    useEffect(() => {
-
-        let oppPlayer;
-        let playerPieces = [];
-
-        let allNewPossibleMoves = [];
-
-        if (whiteIsInCheck) {
-            oppPlayer = "black"
-            for (let i = 0; i < board.length; i++) {
-                if (typeof board[i] === "object" && board[i].player === "white") {
-                    playerPieces.push(i);
-                }
-            }
-
-            for (let j = 0; j < playerPieces.length; j++) {
-
-                let newPossibleMoves = handleThisPiece(playerPieces[j]);
-                // let newAllowedMoves = []
-
-                for (let i = 0; i < newPossibleMoves.length; i++) {
-                    // returns new board
-                    let testBoard = changeNextMoveBoard(newPossibleMoves[i]);
-                    // returns array of squares being attacked by player
-                    let futureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
-                    if (checkIfPlayerIsInCheck("white", futureAttackingMoves, testBoard)) {
-                        console.log(`This move: ${newPossibleMoves[i]} will put you in check`)
-                    } else {
-                        allNewPossibleMoves.push(newPossibleMoves[i])
+    /*     useEffect(() => {
+            let playerPieces = [];
+            let oppPlayer;
+            let allNewPossibleMoves = [];
+    
+            if (whiteIsInCheck) {
+                oppPlayer = findOppPlayer("white")
+                playerPieces = findAllPlayerPieces(oppPlayer, board)
+    
+                allNewPossibleMoves = findEveryLegalMove(playerPieces, oppPlayer)
+    
+                for (let j = 0; j < playerPieces.length; j++) {
+    
+                    let newPossibleMoves = handleThisPiece(playerPieces[j]);
+                    // let newAllowedMoves = []
+    
+                    for (let i = 0; i < newPossibleMoves.length; i++) {
+                        // returns new board
+                        let testBoard = changeNextMoveBoard(newPossibleMoves[i]);
+                        // returns array of squares being attacked by player
+                        let futureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
+                        if (checkIfPlayerIsInCheck("white", futureAttackingMoves, testBoard)) {
+                            console.log(`This move: ${newPossibleMoves[i]} will put you in check`)
+                        } else {
+                            allNewPossibleMoves.push(newPossibleMoves[i])
+                        }
                     }
+                    // allNewPossibleMoves.push([...newAllowedMoves])
                 }
-                // allNewPossibleMoves.push([...newAllowedMoves])
+    
+                // if (allNewPossibleMoves.length < 1) {
+                //     console.log('youre checkmated')
+                // }
+                console.log(allNewPossibleMoves)
             }
-
-            // if (allNewPossibleMoves.length < 1) {
-            //     console.log('youre checkmated')
-            // }
-            console.log(allNewPossibleMoves)
-        }
-
-    }, [whiteIsInCheck, blackIsInCheck, board, changeNextMoveBoard, checkIfPlayerIsInCheck, handleThisPiece, seeAttackingSquares])
+    
+        }, [whiteIsInCheck, blackIsInCheck, board, changeNextMoveBoard, checkIfPlayerIsInCheck, handleThisPiece, seeAttackingSquares]) */
 
     return (
         <div className='gameboard'>
