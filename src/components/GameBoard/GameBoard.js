@@ -663,7 +663,7 @@ function GameBoard() {
             console.log(allNewPossibleMoves)
         }
 
-    }, [whiteIsInCheck, blackIsInCheck])
+    }, [whiteIsInCheck, blackIsInCheck, board, changeNextMoveBoard, checkIfPlayerIsInCheck, handleThisPiece, seeAttackingSquares])
 
     return (
         <div className='gameboard'>
