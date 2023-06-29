@@ -15,9 +15,11 @@ function GameBoard() {
 
     const [whiteIsInCheck, setWhiteIsInCheck] = useState(false);
     const [blackIsInCheck, setBlackIsInCheck] = useState(false);
-    
+
     const [whiteIsInCheckmate, setWhiteIsInCheckmate] = useState(false);
     const [blackIsInCheckmate, setBlackIsInCheckmate] = useState(false);
+
+    const [isItStalemate, setIsItStalemate] = useState(false);
 
     const [squaresAttackedByWhite, setSquaresAttackedByWhite] = useState([]);
     const [squaresAttackedByBlack, setSquaresAttackedByBlack] = useState([]);
@@ -178,7 +180,7 @@ function GameBoard() {
                 if (index / ranks < 6 && table[index - 8] === "") {
                     possibleMovesArr.push(index - 8);
                 }
-                if (typeof table[index - 9] === "object" && table[index - 7].player === 'black') {
+                if (typeof table[index - 7] === "object" && table[index - 7].player === 'black') {
                     possibleMovesArr.push(index - 7);
                 }
                 if (typeof table[index - 9] === "object" && table[index - 9].player === 'black') {
@@ -194,10 +196,10 @@ function GameBoard() {
                 if (index / ranks > 2 && table[index + 8] === "") {
                     possibleMovesArr.push(index + 8);
                 }
-                if (typeof table[index - 9] === "object" && typeof table[index + 9] === "object" && table[index + 7].player === 'white') {
+                if (typeof table[index + 7] === "object" && table[index + 7].player === 'white') {
                     possibleMovesArr.push(index + 7);
                 }
-                if (typeof table[index - 9] === "object" && typeof table[index + 9] === "object" && table[index + 9].player === 'white') {
+                if (typeof table[index + 9] === "object" && table[index + 9].player === 'white') {
                     possibleMovesArr.push(index + 9);
                 }
             }
@@ -380,30 +382,58 @@ function GameBoard() {
 
             // going down
             for (let i = square + 7; i < square + 10 && i < 64; i++) {
-                if (table[i]) {
-                    if (table[i].player !== currentPlayer) {
+                if (i === square + 7 || i === square + 9) {
+                    if (checkNewFileDiff(i, square, 1)) {
+                        if (table[i]) {
+                            if (table[i].player !== currentPlayer) {
+                                movesArr.push(i);
+                            }
+                        } else if (!table[i]) {
+                            movesArr.push(i);
+                        }
+                    }
+                }
+                if (i === square + 8) {
+                    if (table[i]) {
+                        if (table[i].player !== currentPlayer) {
+                            movesArr.push(i);
+                        }
+                    } else if (!table[i]) {
                         movesArr.push(i);
                     }
-                } else if (!table[i]) {
-                    movesArr.push(i);
                 }
             }
             //going up
             for (let i = square - 7; i > square - 10 && i >= 0; i--) {
-                if (table[i]) {
-                    if (table[i].player !== currentPlayer) {
+                if (i === square - 7 || i === square - 9) {
+                    if (checkNewFileDiff(i, square, 1)) {
+                        if (table[i]) {
+                            if (table[i].player !== currentPlayer) {
+                                movesArr.push(i);
+                            }
+                        } else if (!table[i]) {
+                            movesArr.push(i);
+                        }
+                    }
+                }
+                if (i === square - 8) {
+                    if (table[i]) {
+                        if (table[i].player !== currentPlayer) {
+                            movesArr.push(i);
+                        }
+                    } else if (!table[i]) {
+                        console.log(`you can move to this square ${i}`)
                         movesArr.push(i);
                     }
-                } else if (!table[i]) {
-                    movesArr.push(i);
                 }
+
             }
             // right
-            if (table[rightMove].player !== currentPlayer) {
+            if (rightMove <= 63 && table[rightMove].player !== currentPlayer) {
                 movesArr.push(rightMove);
             }
             // left
-            if (table[leftMove].player !== currentPlayer) {
+            if (leftMove > 0 && table[leftMove].player !== currentPlayer) {
                 movesArr.push(leftMove);
             }
             return movesArr;
@@ -636,23 +666,11 @@ function GameBoard() {
 
     //check if player is in check
     useEffect(() => {
-        //check if white is in check
         setWhiteIsInCheck(checkIfPlayerIsInCheck("white", squaresAttackedByBlack))
         setBlackIsInCheck(checkIfPlayerIsInCheck("black", squaresAttackedByWhite))
     }, [squaresAttackedByBlack, squaresAttackedByWhite, checkIfPlayerIsInCheck, board])
 
-    // useEffect(() => {
-    //     if (whiteIsInCheck) {
-    //         console.log('white is in check')
-    //         return;
-    //     } else if (blackIsInCheck) {
-    //         console.log('black is in check')
-    //         return;
-    //     } else {
-    //         console.log('no one is in check')
-    //     }
-    // }, [whiteIsInCheck, blackIsInCheck, board])
-
+    //checks for checkmate
     useEffect(() => {
         if (blackIsInCheck) {
             let playerPieces = findAllPlayerPieces("black")
@@ -665,52 +683,31 @@ function GameBoard() {
         if (whiteIsInCheck) {
             let playerPieces = findAllPlayerPieces("white")
             let legalMoves = findEveryLegalMove(playerPieces, findOppPlayer("white"));
-            console.log(legalMoves)
             if (legalMoves.length === 0) {
                 console.log('youre white and youre checkmate pal')
                 setWhiteIsInCheckmate(true)
             }
         }
+        if (playerTurn === "white" && !whiteIsInCheck) {
+            let playerPieces = findAllPlayerPieces("white")
+            console.log(playerPieces)
+            let legalMoves = findEveryLegalMove(playerPieces, findOppPlayer("white"));
+            console.log(legalMoves)
+            if (legalMoves.length === 0) {
+                console.log('no possible moves for you, its a stalemate draw')
+                setIsItStalemate(true)
+            }
+        }
+        if (playerTurn === "black" && !blackIsInCheckmate) {
+            let playerPieces = findAllPlayerPieces("white")
+            let legalMoves = findEveryLegalMove(playerPieces, findOppPlayer("white"));
+            if (legalMoves.length === 0) {
+                console.log('no possible moves for you, its a stalemate draw')
+                setIsItStalemate(true)
+            }
+        }
 
     }, [board, blackIsInCheck, whiteIsInCheck])
-
-    /*     useEffect(() => {
-            let playerPieces = [];
-            let oppPlayer;
-            let allNewPossibleMoves = [];
-    
-            if (whiteIsInCheck) {
-                oppPlayer = findOppPlayer("white")
-                playerPieces = findAllPlayerPieces(oppPlayer, board)
-    
-                allNewPossibleMoves = findEveryLegalMove(playerPieces, oppPlayer)
-    
-                for (let j = 0; j < playerPieces.length; j++) {
-    
-                    let newPossibleMoves = handleThisPiece(playerPieces[j]);
-                    // let newAllowedMoves = []
-    
-                    for (let i = 0; i < newPossibleMoves.length; i++) {
-                        // returns new board
-                        let testBoard = changeNextMoveBoard(newPossibleMoves[i]);
-                        // returns array of squares being attacked by player
-                        let futureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
-                        if (checkIfPlayerIsInCheck("white", futureAttackingMoves, testBoard)) {
-                            console.log(`This move: ${newPossibleMoves[i]} will put you in check`)
-                        } else {
-                            allNewPossibleMoves.push(newPossibleMoves[i])
-                        }
-                    }
-                    // allNewPossibleMoves.push([...newAllowedMoves])
-                }
-    
-                // if (allNewPossibleMoves.length < 1) {
-                //     console.log('youre checkmated')
-                // }
-                console.log(allNewPossibleMoves)
-            }
-    
-        }, [whiteIsInCheck, blackIsInCheck, board, changeNextMoveBoard, checkIfPlayerIsInCheck, handleThisPiece, seeAttackingSquares]) */
 
     return (
         <div className='gameboard'>
@@ -732,7 +729,27 @@ function GameBoard() {
                     )
                 })
             }
-            <div>It is {playerTurn}'s turn</div>
+            <div>
+                <div>It is {playerTurn}'s turn</div>
+                {
+                    whiteIsInCheckmate ?
+                        <p>
+                            "Game over: White has been checkmated"
+                        </p> : false
+                }
+                {
+                    blackIsInCheckmate ?
+                        <p>
+                            "Game over: Black has been checkmated"
+                        </p> : false
+                }
+                {
+                    isItStalemate ?
+                        <p>
+                            "Game over, it's stalemate"
+                        </p> : false
+                }
+            </div>
         </div>
     )
 }
