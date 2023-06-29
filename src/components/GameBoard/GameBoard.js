@@ -15,6 +15,9 @@ function GameBoard() {
 
     const [whiteIsInCheck, setWhiteIsInCheck] = useState(false);
     const [blackIsInCheck, setBlackIsInCheck] = useState(false);
+    
+    const [whiteIsInCheckmate, setWhiteIsInCheckmate] = useState(false);
+    const [blackIsInCheckmate, setBlackIsInCheckmate] = useState(false);
 
     const [squaresAttackedByWhite, setSquaresAttackedByWhite] = useState([]);
     const [squaresAttackedByBlack, setSquaresAttackedByBlack] = useState([]);
@@ -521,13 +524,13 @@ function GameBoard() {
     }
 
     // returns a board in an array with the simulated move
-    const changeNextMoveBoard = useCallback((squareToMoveTo) => {
+    const changeNextMoveBoard = useCallback((squareToMoveTo, pieceToMove) => {
         let simulatedBoard = _.cloneDeep(board);
         let newSimulatedBoard = simulatedBoard.map((square, index) => {
             if (index === squareToMoveTo) {
-                square = simulatedBoard[selectedPiece]
+                square = simulatedBoard[pieceToMove]
                 return square;
-            } else if (index === selectedPiece) {
+            } else if (index === pieceToMove) {
                 square = "";
                 return square;
             } else {
@@ -535,7 +538,7 @@ function GameBoard() {
             }
         })
         return newSimulatedBoard
-    }, [board, selectedPiece])
+    }, [board])
 
     const findKingSquare = useCallback((player, table = board) => {
         let foundKingSquare;
@@ -568,6 +571,7 @@ function GameBoard() {
                 playerPieces.push(i);
             }
         }
+        return playerPieces
     }, [board])
 
     const findOppPlayer = useCallback((player) => {
@@ -578,16 +582,15 @@ function GameBoard() {
         }
     }, [])
 
-    const findLegalMoves = useCallback((movesArr, oppPlayer) => {
+    const findLegalMoves = useCallback((movesArr, oppPlayer, pieceToMove) => {
         let filteredMoves = []
         for (let i = 0; i < movesArr.length; i++) {
             // returns new board
-            let testBoard = changeNextMoveBoard(movesArr[i]);
+            let testBoard = changeNextMoveBoard(movesArr[i], pieceToMove);
             // returns array of squares being attacked by player
             let oppFutureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
-            console.log(`if ${board[selectedPiece] ? board[selectedPiece].piece : ""} moves to ${movesArr[i]}, these will be the opponents attacking squares ${oppFutureAttackingMoves}`)
             if (checkIfPlayerIsInCheck(findOppPlayer(oppPlayer), oppFutureAttackingMoves, testBoard)) {
-                console.log(`This move: ${movesArr[i]} will put you in check`)
+
             } else {
                 filteredMoves.push(movesArr[i])
             }
@@ -599,10 +602,9 @@ function GameBoard() {
         let everyLegalMove = []
         for (let j = 0; j < playerPiecesArr.length; j++) {
             let piecePossibleMoves = handleThisPiece(playerPiecesArr[j], board);
-            everyLegalMove.push(findLegalMoves(piecePossibleMoves, oppPlayer))
+            everyLegalMove = [...everyLegalMove, ...findLegalMoves(piecePossibleMoves, oppPlayer, playerPiecesArr[j])];
         }
-        console.log(everyLegalMove)
-        return everyLegalMove
+        return everyLegalMove;
     }, [board, findLegalMoves, handleThisPiece])
 
 
@@ -613,13 +615,12 @@ function GameBoard() {
             let oppPlayer = findOppPlayer(board[selectedPiece].player)
             //you get back array
             let newPossibleMoves = handleThisPiece(selectedPiece);
-            let legalMoves = findLegalMoves(newPossibleMoves, oppPlayer)
-            console.log(legalMoves)
+            let legalMoves = findLegalMoves(newPossibleMoves, oppPlayer, selectedPiece)
             setPossibleMoves(legalMoves);
         } else {
             setPossibleMoves([])
         }
-    }, [selectedPiece, handleThisPiece, board, changeNextMoveBoard, seeAttackingSquares, checkIfPlayerIsInCheck, findLegalMoves, findOppPlayer])
+    }, [selectedPiece, handleThisPiece, board, findLegalMoves, findOppPlayer])
 
     //set player's king squares
     useEffect(() => {
@@ -640,17 +641,38 @@ function GameBoard() {
         setBlackIsInCheck(checkIfPlayerIsInCheck("black", squaresAttackedByWhite))
     }, [squaresAttackedByBlack, squaresAttackedByWhite, checkIfPlayerIsInCheck, board])
 
+    // useEffect(() => {
+    //     if (whiteIsInCheck) {
+    //         console.log('white is in check')
+    //         return;
+    //     } else if (blackIsInCheck) {
+    //         console.log('black is in check')
+    //         return;
+    //     } else {
+    //         console.log('no one is in check')
+    //     }
+    // }, [whiteIsInCheck, blackIsInCheck, board])
+
     useEffect(() => {
-        if (whiteIsInCheck) {
-            console.log('white is in check')
-            return;
-        } else if (blackIsInCheck) {
-            console.log('black is in check')
-            return;
-        } else {
-            console.log('no one is in check')
+        if (blackIsInCheck) {
+            let playerPieces = findAllPlayerPieces("black")
+            let legalMoves = findEveryLegalMove(playerPieces, findOppPlayer("black"));
+            if (legalMoves.length === 0) {
+                console.log('youre black and youre in checkmate pal')
+                setBlackIsInCheckmate(true)
+            }
         }
-    }, [whiteIsInCheck, blackIsInCheck, board])
+        if (whiteIsInCheck) {
+            let playerPieces = findAllPlayerPieces("white")
+            let legalMoves = findEveryLegalMove(playerPieces, findOppPlayer("white"));
+            console.log(legalMoves)
+            if (legalMoves.length === 0) {
+                console.log('youre white and youre checkmate pal')
+                setWhiteIsInCheckmate(true)
+            }
+        }
+
+    }, [board, blackIsInCheck, whiteIsInCheck])
 
     /*     useEffect(() => {
             let playerPieces = [];
