@@ -27,6 +27,21 @@ function GameBoard() {
     const [whiteKingSquare, setWhiteKingSquare] = useState(60);
     const [blackKingSquare, setBlackKingSquare] = useState(4);
 
+    const [whiteLeftRookMoved, setWhiteLeftRookMoved] = useState(false);
+    const [whiteRightRookMoved, setWhiteRightRookMoved] = useState(false);
+
+    const [blackLeftRookMoved, setBlackLeftRookMoved] = useState(false);
+    const [blackRightRookMoved, setBlackRightRookMoved] = useState(false);
+
+    const [hasWhiteKingMoved, setHasWhiteKingMoved] = useState(false);
+    const [hasBlackKingMoved, setHasBlackKingMoved] = useState(false);
+
+    const [canWhiteCastle, setCanWhiteCastle] = useState(true);
+    const [canBlackCastle, setCanBlackCastle] = useState(true);
+
+    const [whiteCastled, setWhiteCastled] = useState(false);
+    const [blackCastled, setBlackCastled] = useState(false);
+
     // const [whiteIsCheckmated, setWhiteIsCheckmated] = useState(false);
     // const [blackIsCheckmated, setBlackIsCheckmated] = useState(false);
 
@@ -379,6 +394,10 @@ function GameBoard() {
             let currentPlayer = piece.player;
             let rightMove = square + 1;
             let leftMove = square - 1
+            let whiteRightCastleSquare = 62;
+            let whiteLeftCastleSquare = 58;
+            let blackRightCastleSquare = 6;
+            let blackLeftCastleSquare = 2;
 
             // going down
             for (let i = square + 7; i < square + 10 && i < 64; i++) {
@@ -422,7 +441,6 @@ function GameBoard() {
                             movesArr.push(i);
                         }
                     } else if (!table[i]) {
-                        console.log(`you can move to this square ${i}`)
                         movesArr.push(i);
                     }
                 }
@@ -436,9 +454,26 @@ function GameBoard() {
             if (leftMove > 0 && table[leftMove].player !== currentPlayer) {
                 movesArr.push(leftMove);
             }
+
+            //white castle
+            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string") {
+                movesArr.push(whiteRightCastleSquare)
+            }
+            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteLeftRookMoved === false && typeof table[59] === "string" && typeof table[58] === "string" && typeof table[57] === "string") {
+                movesArr.push(whiteLeftCastleSquare)
+            }
+
+            //black castle
+            if (table[square].player === "black" && hasBlackKingMoved === false && blackRightRookMoved === false && typeof table[5] === "string" && typeof table[6] === "string") {
+                movesArr.push(blackRightCastleSquare)
+            }
+            if (table[square].player === "black" && hasBlackKingMoved === false && blackLeftRookMoved === false && typeof table[3] === "string" && typeof table[2] === "string" && typeof table[1] === "string") {
+                movesArr.push(blackLeftCastleSquare)
+            }
+
             return movesArr;
         }
-        , [board])
+        , [board, hasWhiteKingMoved, playerTurn, whiteRightRookMoved])
 
     const knightMoves = useCallback(
         function knightMoves(piece, square, table = board) {
@@ -528,6 +563,90 @@ function GameBoard() {
             return;
         }
         if (typeof validSquare === 'number' && playerTurn === table[selectedPiece].player && table === board) {
+            //castling white, left
+            if (validSquare === 58 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "white") {
+                setBoard((prev) => {
+                    let newBoard = prev.map((square, index) => {
+                        if (index === validSquare) {
+                            square = table[selectedPiece];
+                            return square;
+                        } else if (index === 59) {
+                            square = table[56];
+                            return square;
+                        } else if (index === 56) {
+                            square = ""
+                            return square;
+                        }else {
+                            return square;
+                        }
+                    })
+                    return newBoard;
+                })
+            }
+
+            // castling white, right
+            if (validSquare === 62 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "white") {
+                setBoard((prev) => {
+                    let newBoard = prev.map((square, index) => {
+                        if (index === validSquare) {
+                            square = table[selectedPiece];
+                            return square;
+                        } else if (index === 61) {
+                            square = table[63];
+                            return square;
+                        } else if (index === 63) {
+                            square = ""
+                            return square;
+                        }else {
+                            return square;
+                        }
+                    })
+                    return newBoard;
+                })
+            }
+
+            //castle black, right
+            if (validSquare === 6 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "black") {
+                setBoard((prev) => {
+                    let newBoard = prev.map((square, index) => {
+                        if (index === validSquare) {
+                            square = table[selectedPiece];
+                            return square;
+                        } else if (index === 5) {
+                            square = table[7];
+                            return square;
+                        } else if (index === 7) {
+                            square = ""
+                            return square;
+                        }else {
+                            return square;
+                        }
+                    })
+                    return newBoard;
+                })
+            }
+
+            //castle black, left
+            if (validSquare === 2 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "black") {
+                setBoard((prev) => {
+                    let newBoard = prev.map((square, index) => {
+                        if (index === validSquare) {
+                            square = table[selectedPiece];
+                            return square;
+                        } else if (index === 3) {
+                            square = table[0];
+                            return square;
+                        } else if (index === 0) {
+                            square = ""
+                            return square;
+                        }else {
+                            return square;
+                        }
+                    })
+                    return newBoard;
+                })
+            }
+
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
                     if (index === validSquare) {
@@ -540,14 +659,14 @@ function GameBoard() {
                         return square;
                     }
                 })
-                if (playerTurn === 'white') {
-                    setPlayerTurn('black')
-                } else {
-                    setPlayerTurn('white')
-                }
-                setSelectedPiece(null)
                 return newBoard;
             })
+            if (playerTurn === 'white') {
+                setPlayerTurn('black')
+            } else if (playerTurn === "black") {
+                setPlayerTurn('white')
+            }
+            setSelectedPiece(null)
         } else {
             return;
         }
@@ -578,6 +697,21 @@ function GameBoard() {
             }
         }
         return foundKingSquare
+    }, [board])
+
+    const checkIfPieceMoved = useCallback((pieceThatMoved, pieceStartingSquare) => {
+        let didPieceMove = false;
+
+        if (typeof board[pieceStartingSquare] === "object") {
+            if (board[pieceStartingSquare].piece !== pieceThatMoved) {
+                didPieceMove = true;
+            }
+        } else {
+            didPieceMove = true;
+        }
+
+        return didPieceMove;
+
     }, [board])
 
     const checkIfPlayerIsInCheck = useCallback((player, attackArray, table = board) => {
@@ -614,11 +748,14 @@ function GameBoard() {
 
     const findLegalMoves = useCallback((movesArr, oppPlayer, pieceToMove) => {
         let filteredMoves = []
+        // console.log(movesArr)
         for (let i = 0; i < movesArr.length; i++) {
             // returns new board
             let testBoard = changeNextMoveBoard(movesArr[i], pieceToMove);
+            // console.log(testBoard)
             // returns array of squares being attacked by player
             let oppFutureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
+            // console.log(oppFutureAttackingMoves)
             if (checkIfPlayerIsInCheck(findOppPlayer(oppPlayer), oppFutureAttackingMoves, testBoard)) {
 
             } else {
@@ -626,7 +763,7 @@ function GameBoard() {
             }
         }
         return filteredMoves;
-    }, [board, changeNextMoveBoard, checkIfPlayerIsInCheck, findOppPlayer, seeAttackingSquares, selectedPiece])
+    }, [changeNextMoveBoard, checkIfPlayerIsInCheck, findOppPlayer, seeAttackingSquares])
 
     const findEveryLegalMove = useCallback((playerPiecesArr, oppPlayer) => {
         let everyLegalMove = []
@@ -657,6 +794,59 @@ function GameBoard() {
         setWhiteKingSquare(findKingSquare("white"))
         setBlackKingSquare(findKingSquare("black"))
     }, [board, findKingSquare])
+
+    // set player's rooks squares
+    useEffect(() => {
+
+    }, [board])
+
+    //check if white king moved, castling is false
+    useEffect(() => {
+        if (whiteKingSquare !== 60) {
+            setHasWhiteKingMoved(true)
+            setCanWhiteCastle(false)
+        }
+    }, [whiteKingSquare])
+
+    //check if black king moved, castling is false
+    useEffect(() => {
+        if (blackKingSquare !== 4) {
+            setHasBlackKingMoved(true)
+            setCanBlackCastle(false)
+        }
+    }, [blackKingSquare])
+
+    // check if white left rook moved
+    useEffect(() => {
+        let didWhiteLeftRookMove = checkIfPieceMoved("Rook", 56)
+        if (didWhiteLeftRookMove === true) {
+            setWhiteLeftRookMoved(true)
+        }
+    }, [board, checkIfPieceMoved])
+
+    // check if white right rook moved
+    useEffect(() => {
+        let didWhiteRightRookMove = checkIfPieceMoved("Rook", 63)
+        if (didWhiteRightRookMove === true) {
+            setWhiteRightRookMoved(true)
+        }
+    }, [board, checkIfPieceMoved])
+
+    // check if black left rook moved
+    useEffect(() => {
+        let didBlackLeftRookMove = checkIfPieceMoved("Rook", 0)
+        if (didBlackLeftRookMove === true) {
+            setBlackLeftRookMoved(true)
+        }
+    }, [board, checkIfPieceMoved])
+
+    // check if black right rook moved
+    useEffect(() => {
+        let didBlackRightRookMove = checkIfPieceMoved("Rook", 7)
+        if (didBlackRightRookMove === true) {
+            setBlackRightRookMoved(true)
+        }
+    }, [board, checkIfPieceMoved])
 
     //set player's attacking squares
     useEffect(() => {
@@ -690,15 +880,12 @@ function GameBoard() {
         }
         if (playerTurn === "white" && !whiteIsInCheck) {
             let playerPieces = findAllPlayerPieces("white")
-            console.log(playerPieces)
             let legalMoves = findEveryLegalMove(playerPieces, findOppPlayer("white"));
-            console.log(legalMoves)
             if (legalMoves.length === 0) {
-                console.log('no possible moves for you, its a stalemate draw')
                 setIsItStalemate(true)
             }
         }
-        if (playerTurn === "black" && !blackIsInCheckmate) {
+        if (playerTurn === "black" && !blackIsInCheck) {
             let playerPieces = findAllPlayerPieces("white")
             let legalMoves = findEveryLegalMove(playerPieces, findOppPlayer("white"));
             if (legalMoves.length === 0) {
@@ -707,7 +894,7 @@ function GameBoard() {
             }
         }
 
-    }, [board, blackIsInCheck, whiteIsInCheck])
+    }, [board, blackIsInCheck, whiteIsInCheck, findAllPlayerPieces, findEveryLegalMove, findOppPlayer, playerTurn])
 
     return (
         <div className='gameboard'>
