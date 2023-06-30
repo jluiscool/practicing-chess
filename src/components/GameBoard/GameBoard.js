@@ -396,18 +396,54 @@ function GameBoard() {
             return movesArr;
         }, [rookMoves, bishopMoves, board])
 
+
+    const knightMoves = useCallback(
+        function knightMoves(piece, square, table = board) {
+            let movesArr = [];
+            let currentPlayer = piece.player;
+            let topRight = square - 15;
+            let rightTop = square - 6;
+            let rightBottom = square + 10;
+            let bottomRight = square + 17;
+            let bottomLeft = square + 15;
+            let leftBottom = square + 6;
+            let leftTop = square - 10;
+            let topLeft = square - 17;
+
+            if (table[topRight] !== undefined && table[topRight].player !== currentPlayer && topRight < 64 && topRight >= 0 && checkNewFileDiff(topRight, square, 1)) {
+                movesArr.push(topRight)
+            }
+            if (table[rightTop] !== undefined && table[rightTop].player !== currentPlayer && rightTop < 64 && rightTop >= 0 && checkNewFileDiff(rightTop, square, 2)) {
+                movesArr.push(rightTop)
+            }
+            if (table[rightBottom] !== undefined && table[rightBottom].player !== currentPlayer && rightBottom < 64 && rightBottom >= 0 && checkNewFileDiff(rightBottom, square, 2)) {
+                movesArr.push(rightBottom)
+            }
+            if (table[bottomRight] !== undefined && table[bottomRight].player !== currentPlayer && bottomRight < 64 && bottomRight >= 0 && checkNewFileDiff(bottomRight, square, 1)) {
+                movesArr.push(bottomRight)
+            }
+            if (table[bottomLeft] !== undefined && table[bottomLeft].player !== currentPlayer && bottomLeft < 64 && bottomLeft >= 0 && checkNewFileDiff(bottomLeft, square, 1)) {
+                movesArr.push(bottomLeft)
+            }
+            if (table[leftBottom] !== undefined && table[leftBottom].player !== currentPlayer && leftBottom < 64 && leftBottom >= 0 && checkNewFileDiff(leftBottom, square, 2)) {
+                movesArr.push(leftBottom)
+            }
+            if (table[leftTop] !== undefined && table[leftTop].player !== currentPlayer && leftTop < 64 && leftTop >= 0 && checkNewFileDiff(leftTop, square, 2)) {
+                movesArr.push(leftTop)
+            }
+            if (table[topLeft] !== undefined && table[topLeft].player !== currentPlayer && topLeft < 64 && topLeft >= 0 && checkNewFileDiff(topLeft, square, 1)) {
+                movesArr.push(topLeft)
+            }
+
+            return movesArr;
+        }, [board])
+
     const kingMoves = useCallback(
         function kingMoves(piece, square, table = board) {
             let movesArr = [];
             let currentPlayer = piece.player;
             let rightMove = square + 1;
             let leftMove = square - 1
-            let whiteRightCastleSquare = 62;
-            let whiteLeftCastleSquare = 58;
-            let blackRightCastleSquare = 6;
-            let blackLeftCastleSquare = 2;
-            // let canWhiteCastleRight = true;
-            // let canWhiteCastleLeft = true;
 
             // going down
             for (let i = square + 7; i < square + 10 && i < 64; i++) {
@@ -465,95 +501,77 @@ function GameBoard() {
                 movesArr.push(leftMove);
             }
 
-            function checkIfBetweenSquareIsAttacked(player, squareBeingChecked) {
-                let betweenSquareIsAttacked = false;
-                if (player === "white") {
-                    for (let i = 0; i < squaresAttackedByWhite.length; i++) {
-                        if (squaresAttackedByWhite[i] === squareBeingChecked) {
-                            betweenSquareIsAttacked = true;
-                        }
-                    }
-                }
-                if (player === "black") {
-                    for (let i = 0; i < squaresAttackedByBlack.length; i++) {
-                        if (squaresAttackedByWhite[i] === squareBeingChecked) {
-                            betweenSquareIsAttacked = true;
-                        }
-                    }
-                }
-
-                return betweenSquareIsAttacked;
-            }
-
-            //white castle
-            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string" && !whiteIsInCheck) {
-                if (!checkIfBetweenSquareIsAttacked("black", 61)) {
-                    movesArr.push(whiteRightCastleSquare)
-                }
-            }
-
-            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteLeftRookMoved === false && typeof table[59] === "string" && typeof table[58] === "string" && typeof table[57] === "string" && !whiteIsInCheck) {
-                if (!checkIfBetweenSquareIsAttacked("black", 59)) {
-                    movesArr.push(whiteLeftCastleSquare)
-                }
-            }
-
-            //black castle
-            if (table[square].player === "black" && hasBlackKingMoved === false && blackRightRookMoved === false && typeof table[5] === "string" && typeof table[6] === "string" && !blackIsInCheck) {
-                if (!checkIfBetweenSquareIsAttacked("white", 5)) {
-                    movesArr.push(blackRightCastleSquare)
-                }
-            }
-            if (table[square].player === "black" && hasBlackKingMoved === false && blackLeftRookMoved === false && typeof table[3] === "string" && typeof table[2] === "string" && typeof table[1] === "string" && !blackIsInCheck) {
-                if (!checkIfBetweenSquareIsAttacked("white", 5)) {
-                    movesArr.push(blackLeftCastleSquare)
-                }
-            }
-
             return movesArr;
         }
-        , [board, hasWhiteKingMoved, whiteRightRookMoved, blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, hasBlackKingMoved, whiteIsInCheck, whiteLeftRookMoved, ])
+        , [board])
 
-    const knightMoves = useCallback(
-        function knightMoves(piece, square, table = board) {
-            let movesArr = [];
-            let currentPlayer = piece.player;
-            let topRight = square - 15;
-            let rightTop = square - 6;
-            let rightBottom = square + 10;
-            let bottomRight = square + 17;
-            let bottomLeft = square + 15;
-            let leftBottom = square + 6;
-            let leftTop = square - 10;
-            let topLeft = square - 17;
+    const checkIfBetweenSquareIsAttacked = useCallback((player, squareBeingChecked) => {
+        let betweenSquareIsAttacked = false;
+        if (player === "white") {
+            console.log(`These are the squares attacked by white: ${squaresAttackedByWhite}`)
+            for (let i = 0; i < squaresAttackedByWhite.length; i++) {
+                if (squaresAttackedByWhite[i] === squareBeingChecked) {
+                    betweenSquareIsAttacked = true;
+                    console.log(`The square ${squareBeingChecked} is being attacked`)
+                } else {
+                    console.log(`${squareBeingChecked}`)
+                }
+            }
+        }
+        if (player === "black") {
+            console.log(`These are the squares attacked by black: ${squaresAttackedByBlack}`)
+            for (let i = 0; i < squaresAttackedByBlack.length; i++) {
+                if (squaresAttackedByBlack[i] === squareBeingChecked) {
+                    betweenSquareIsAttacked = true;
+                }
+            }
+        }
 
-            if (table[topRight] !== undefined && table[topRight].player !== currentPlayer && topRight < 64 && topRight >= 0 && checkNewFileDiff(topRight, square, 1)) {
-                movesArr.push(topRight)
-            }
-            if (table[rightTop] !== undefined && table[rightTop].player !== currentPlayer && rightTop < 64 && rightTop >= 0 && checkNewFileDiff(rightTop, square, 2)) {
-                movesArr.push(rightTop)
-            }
-            if (table[rightBottom] !== undefined && table[rightBottom].player !== currentPlayer && rightBottom < 64 && rightBottom >= 0 && checkNewFileDiff(rightBottom, square, 2)) {
-                movesArr.push(rightBottom)
-            }
-            if (table[bottomRight] !== undefined && table[bottomRight].player !== currentPlayer && bottomRight < 64 && bottomRight >= 0 && checkNewFileDiff(bottomRight, square, 1)) {
-                movesArr.push(bottomRight)
-            }
-            if (table[bottomLeft] !== undefined && table[bottomLeft].player !== currentPlayer && bottomLeft < 64 && bottomLeft >= 0 && checkNewFileDiff(bottomLeft, square, 1)) {
-                movesArr.push(bottomLeft)
-            }
-            if (table[leftBottom] !== undefined && table[leftBottom].player !== currentPlayer && leftBottom < 64 && leftBottom >= 0 && checkNewFileDiff(leftBottom, square, 2)) {
-                movesArr.push(leftBottom)
-            }
-            if (table[leftTop] !== undefined && table[leftTop].player !== currentPlayer && leftTop < 64 && leftTop >= 0 && checkNewFileDiff(leftTop, square, 2)) {
-                movesArr.push(leftTop)
-            }
-            if (table[topLeft] !== undefined && table[topLeft].player !== currentPlayer && topLeft < 64 && topLeft >= 0 && checkNewFileDiff(topLeft, square, 1)) {
-                movesArr.push(topLeft)
-            }
+        return betweenSquareIsAttacked;
+    }, [squaresAttackedByBlack, squaresAttackedByWhite])
 
-            return movesArr;
-        }, [board])
+    const canKingCastle = useCallback((piece, square, table = board) => {
+        let movesArr = [];
+
+        let whiteRightCastleSquare = 62;
+        let whiteLeftCastleSquare = 58;
+        let blackRightCastleSquare = 6;
+        let blackLeftCastleSquare = 2;
+
+        //white castle
+        if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string" && !whiteIsInCheck) {
+            console.log(`The conditions for castling right for white have been partially met.`)
+            if (checkIfBetweenSquareIsAttacked("black", 61) === false) {
+                console.log(`Looks like square 61 is not being attacked`)
+                movesArr.push(whiteRightCastleSquare)
+            }
+        }
+
+        if (table[square].player === "white" && hasWhiteKingMoved === false && whiteLeftRookMoved === false && typeof table[59] === "string" && typeof table[58] === "string" && typeof table[57] === "string" && !whiteIsInCheck) {
+            if (!checkIfBetweenSquareIsAttacked("black", 59)) {
+                movesArr.push(whiteLeftCastleSquare)
+            }
+        }
+
+        // //black castle
+        if (table[square].player === "black" && hasBlackKingMoved === false && blackRightRookMoved === false && typeof table[5] === "string" && typeof table[6] === "string" && !blackIsInCheck) {
+            if (!checkIfBetweenSquareIsAttacked("white", 5)) {
+                movesArr.push(blackRightCastleSquare)
+            }
+        }
+        if (table[square].player === "black" && hasBlackKingMoved === false && blackLeftRookMoved === false && typeof table[3] === "string" && typeof table[2] === "string" && typeof table[1] === "string" && !blackIsInCheck) {
+            if (!checkIfBetweenSquareIsAttacked("white", 5)) {
+                movesArr.push(blackLeftCastleSquare)
+            }
+        }
+        return movesArr
+    }, [blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, board, checkIfBetweenSquareIsAttacked, hasBlackKingMoved, hasWhiteKingMoved, whiteIsInCheck, whiteLeftRookMoved, whiteRightRookMoved])
+
+    const allKingMoves = useCallback((piece, square, table) => {
+        let allMovesArray = kingMoves(piece, square, table).concat(canKingCastle(piece, square, table))
+
+        return allMovesArray;
+    }, [canKingCastle, kingMoves])
 
     const handleThisPiece = useCallback((square, table = board) => {
         let potentialMoves = [];
@@ -570,13 +588,13 @@ function GameBoard() {
             potentialMoves.push(...queenMoves(table[square], square, table));
         }
         if (table[square].piece === 'King') {
-            potentialMoves.push(...kingMoves(table[square], square, table));
+            potentialMoves.push(...allKingMoves(table[square], square, table));
         }
         if (table[square].piece === 'Knight') {
             potentialMoves.push(...knightMoves(table[square], square, table));
         }
         return potentialMoves;
-    }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, board]);
+    }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, allKingMoves, board]);
 
     const seeAttackingSquares = useCallback((attackingPlayer, table = board, pieceToExclude) => {
         let attackedSquaresArr = [];
@@ -944,7 +962,7 @@ function GameBoard() {
     useEffect(() => {
         setSquaresAttackedByBlack(seeAttackingSquares("black"))
         setSquaresAttackedByWhite(seeAttackingSquares("white"))
-    }, [board, seeAttackingSquares])
+    }, [seeAttackingSquares])
 
     //check if player is in check
     useEffect(() => {
@@ -989,9 +1007,9 @@ function GameBoard() {
     }, [board, blackIsInCheck, whiteIsInCheck, findAllPlayerPieces, findEveryLegalMove, findOppPlayer, playerTurn])
 
     //log squaresAttacked
-    useEffect(() => {
-        console.log(`These are the squares attacked by black ${squaresAttackedByBlack}`)
-    }, [squaresAttackedByBlack])
+    // useEffect(() => {
+    //     console.log(`These are the squares attacked by black ${squaresAttackedByBlack}`)
+    // }, [squaresAttackedByBlack])
 
     return (
         <div className='gameboard'>
