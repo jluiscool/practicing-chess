@@ -44,7 +44,7 @@ function GameBoard() {
     const [squareToEnPassant, setSquareToEnPassant] = useState(null)
     const [pawnGettingEnPassant, setPawnGettingEnPassant] = useState(null)
 
-
+    // const [pawnPromotion, setPawnPromotion] = useState(false);
 
     const ranks = 8;
     // const files = 8;
@@ -122,17 +122,6 @@ function GameBoard() {
             WhiteRook, WhiteKnight, WhiteBishop, WhiteQueen, WhiteKing, WhiteBishop, WhiteKnight, WhiteRook
         ]
     )
-
-    const seeAttackingSquares = useCallback((attackingPlayer, table = board) => {
-        let attackedSquaresArr = [];
-
-        for (let i = 0; i < table.length; i++) {
-            if (typeof table[i] === 'object' && table[i].player === attackingPlayer) {
-                attackedSquaresArr.push(...handleThisPiece(i, table));
-            }
-        }
-        return attackedSquaresArr;
-    }, []);
 
     function changeColor(index) {
         let color = '';
@@ -238,7 +227,7 @@ function GameBoard() {
             }
 
             return possibleMovesArr;
-        }, [board])
+        }, [board, canEnPassant, pawnThatCanEnPassant, squareToEnPassant])
 
     const bishopMoves = useCallback(
         function bishopMoves(piece, square, table = board) {
@@ -417,8 +406,8 @@ function GameBoard() {
             let whiteLeftCastleSquare = 58;
             let blackRightCastleSquare = 6;
             let blackLeftCastleSquare = 2;
-            let canWhiteCastleRight = true;
-            let canWhiteCastleLeft = true;
+            // let canWhiteCastleRight = true;
+            // let canWhiteCastleLeft = true;
 
             // going down
             for (let i = square + 7; i < square + 10 && i < 64; i++) {
@@ -476,17 +465,6 @@ function GameBoard() {
                 movesArr.push(leftMove);
             }
 
-            function checkIfBetweenSquareIsAttacked(player, squareBeingChecked) {
-                let betweenSquareIsAttacked = false;
-                let enemyAttackedSquares = seeAttackingSquares(player);
-                for (let i = 0; i < enemyAttackedSquares.length; i++) {
-                    if (enemyAttackedSquares[i] === squareBeingChecked) {
-                        betweenSquareIsAttacked = true;
-                    }
-                }
-                return betweenSquareIsAttacked;
-            }
-
             //white castle
             if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string" && !whiteIsInCheck) {
                 if (!checkIfBetweenSquareIsAttacked("black", 61)) {
@@ -514,7 +492,7 @@ function GameBoard() {
 
             return movesArr;
         }
-        , [board, hasWhiteKingMoved, playerTurn, whiteRightRookMoved, blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, hasBlackKingMoved, seeAttackingSquares, whiteIsInCheck, whiteLeftRookMoved])
+        , [board, hasWhiteKingMoved, whiteRightRookMoved, blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, hasBlackKingMoved, whiteIsInCheck, whiteLeftRookMoved])
 
     const knightMoves = useCallback(
         function knightMoves(piece, square, table = board) {
@@ -557,36 +535,56 @@ function GameBoard() {
             return movesArr;
         }, [board])
 
+    const handleThisPiece = useCallback((square, table = board) => {
+        let potentialMoves = [];
+        if (table[square].piece === 'Pawn') {
+            potentialMoves.push(...pawnMoves(table[square], square, table));
+        }
+        if (table[square].piece === 'Bishop') {
+            potentialMoves.push(...bishopMoves(table[square], square, table));
+        }
+        if (table[square].piece === 'Rook') {
+            potentialMoves.push(...rookMoves(table[square], square, table));
+        }
+        if (table[square].piece === 'Queen') {
+            potentialMoves.push(...queenMoves(table[square], square, table));
+        }
+        if (table[square].piece === 'King') {
+            potentialMoves.push(...kingMoves(table[square], square, table));
+        }
+        if (table[square].piece === 'Knight') {
+            potentialMoves.push(...knightMoves(table[square], square, table));
+        }
+        return potentialMoves;
+    }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, board]);
+
+    const seeAttackingSquares = useCallback((attackingPlayer, table = board, pieceToExclude) => {
+        let attackedSquaresArr = [];
+        for (let i = 0; i < table.length; i++) {
+            if (typeof table[i] === 'object' && table[i].player === attackingPlayer && table[i].piece !== pieceToExclude) {
+                attackedSquaresArr.push(...handleThisPiece(i, table));
+            }
+        }
+        return attackedSquaresArr;
+    }, [board, handleThisPiece]);
+
+    function checkIfBetweenSquareIsAttacked(player, squareBeingChecked) {
+        let betweenSquareIsAttacked = false;
+        let enemyAttackedSquares = seeAttackingSquares(player, board, "King");
+        for (let i = 0; i < enemyAttackedSquares.length; i++) {
+            if (enemyAttackedSquares[i] === squareBeingChecked) {
+                betweenSquareIsAttacked = true;
+            }
+        }
+        return betweenSquareIsAttacked;
+    }
+
     const resetEnPassant = useCallback(() => {
         setCanEnPassant(false);
         setPawnThatCanEnPassant(null);
         setSquareToEnPassant(null);
         setPawnGettingEnPassant(null);
     }, [])
-
-    const handleThisPiece = useCallback(
-        function handleThisPiece(square, table = board) {
-            let potentialMoves = [];
-            if (table[square].piece === 'Pawn') {
-                potentialMoves.push(...pawnMoves(table[square], square, table));
-            }
-            if (table[square].piece === 'Bishop') {
-                potentialMoves.push(...bishopMoves(table[square], square, table));
-            }
-            if (table[square].piece === 'Rook') {
-                potentialMoves.push(...rookMoves(table[square], square, table));
-            }
-            if (table[square].piece === 'Queen') {
-                potentialMoves.push(...queenMoves(table[square], square, table));
-            }
-            if (table[square].piece === 'King') {
-                potentialMoves.push(...kingMoves(table[square], square, table));
-            }
-            if (table[square].piece === 'Knight') {
-                potentialMoves.push(...knightMoves(table[square], square, table));
-            }
-            return potentialMoves;
-        }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, board]);
 
     function movePiece(squareToMoveTo, table = board) {
         let validSquare;
@@ -982,11 +980,11 @@ function GameBoard() {
     }, [board, blackIsInCheck, whiteIsInCheck, findAllPlayerPieces, findEveryLegalMove, findOppPlayer, playerTurn])
 
     //check what pawn can en passant
-    useEffect(() => {
-        console.log(canEnPassant)
-        console.log(pawnThatCanEnPassant)
-        console.log(squareToEnPassant)
-    }, [board])
+    // useEffect(() => {
+    //     console.log(canEnPassant)
+    //     console.log(pawnThatCanEnPassant)
+    //     console.log(squareToEnPassant)
+    // }, [board, canEnPassant])
 
     return (
         <div className='gameboard'>
