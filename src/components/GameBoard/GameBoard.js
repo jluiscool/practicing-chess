@@ -465,6 +465,26 @@ function GameBoard() {
                 movesArr.push(leftMove);
             }
 
+            function checkIfBetweenSquareIsAttacked(player, squareBeingChecked) {
+                let betweenSquareIsAttacked = false;
+                if (player === "white") {
+                    for (let i = 0; i < squaresAttackedByWhite.length; i++) {
+                        if (squaresAttackedByWhite[i] === squareBeingChecked) {
+                            betweenSquareIsAttacked = true;
+                        }
+                    }
+                }
+                if (player === "black") {
+                    for (let i = 0; i < squaresAttackedByBlack.length; i++) {
+                        if (squaresAttackedByWhite[i] === squareBeingChecked) {
+                            betweenSquareIsAttacked = true;
+                        }
+                    }
+                }
+
+                return betweenSquareIsAttacked;
+            }
+
             //white castle
             if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string" && !whiteIsInCheck) {
                 if (!checkIfBetweenSquareIsAttacked("black", 61)) {
@@ -492,7 +512,7 @@ function GameBoard() {
 
             return movesArr;
         }
-        , [board, hasWhiteKingMoved, whiteRightRookMoved, blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, hasBlackKingMoved, whiteIsInCheck, whiteLeftRookMoved])
+        , [board, hasWhiteKingMoved, whiteRightRookMoved, blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, hasBlackKingMoved, whiteIsInCheck, whiteLeftRookMoved, ])
 
     const knightMoves = useCallback(
         function knightMoves(piece, square, table = board) {
@@ -567,17 +587,6 @@ function GameBoard() {
         }
         return attackedSquaresArr;
     }, [board, handleThisPiece]);
-
-    function checkIfBetweenSquareIsAttacked(player, squareBeingChecked) {
-        let betweenSquareIsAttacked = false;
-        let enemyAttackedSquares = seeAttackingSquares(player, board, "King");
-        for (let i = 0; i < enemyAttackedSquares.length; i++) {
-            if (enemyAttackedSquares[i] === squareBeingChecked) {
-                betweenSquareIsAttacked = true;
-            }
-        }
-        return betweenSquareIsAttacked;
-    }
 
     const resetEnPassant = useCallback(() => {
         setCanEnPassant(false);
@@ -979,12 +988,10 @@ function GameBoard() {
 
     }, [board, blackIsInCheck, whiteIsInCheck, findAllPlayerPieces, findEveryLegalMove, findOppPlayer, playerTurn])
 
-    //check what pawn can en passant
-    // useEffect(() => {
-    //     console.log(canEnPassant)
-    //     console.log(pawnThatCanEnPassant)
-    //     console.log(squareToEnPassant)
-    // }, [board, canEnPassant])
+    //log squaresAttacked
+    useEffect(() => {
+        console.log(`These are the squares attacked by black ${squaresAttackedByBlack}`)
+    }, [squaresAttackedByBlack])
 
     return (
         <div className='gameboard'>
