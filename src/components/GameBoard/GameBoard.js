@@ -44,6 +44,8 @@ function GameBoard() {
     const [squareToEnPassant, setSquareToEnPassant] = useState(null)
     const [pawnGettingEnPassant, setPawnGettingEnPassant] = useState(null)
 
+
+
     const ranks = 8;
     // const files = 8;
 
@@ -555,6 +557,13 @@ function GameBoard() {
             return movesArr;
         }, [board])
 
+    const resetEnPassant = useCallback(() => {
+        setCanEnPassant(false);
+        setPawnThatCanEnPassant(null);
+        setSquareToEnPassant(null);
+        setPawnGettingEnPassant(null);
+    }, [])
+
     const handleThisPiece = useCallback(
         function handleThisPiece(square, table = board) {
             let potentialMoves = [];
@@ -646,9 +655,7 @@ function GameBoard() {
                             return square;
                         }
                     })
-                    setCanEnPassant(false);
-                    setPawnThatCanEnPassant(null);
-                    setSquareToEnPassant(null);
+                    resetEnPassant()
                     return newBoard;
                 })
             }
@@ -670,9 +677,7 @@ function GameBoard() {
                             return square;
                         }
                     })
-                    setCanEnPassant(false);
-                    setPawnThatCanEnPassant(null);
-                    setSquareToEnPassant(null);
+                    resetEnPassant()
                     return newBoard;
                 })
             }
@@ -694,9 +699,7 @@ function GameBoard() {
                             return square;
                         }
                     })
-                    setCanEnPassant(false);
-                    setPawnThatCanEnPassant(null);
-                    setSquareToEnPassant(null);
+                    resetEnPassant()
                     return newBoard;
                 })
             }
@@ -718,9 +721,7 @@ function GameBoard() {
                             return square;
                         }
                     })
-                    setCanEnPassant(false);
-                    setPawnThatCanEnPassant(null);
-                    setSquareToEnPassant(null);
+                    resetEnPassant()
                     return newBoard;
                 })
             }
@@ -731,7 +732,7 @@ function GameBoard() {
                     if (index === validSquare) {
                         square = table[selectedPiece];
                         return square;
-                    } else if (canEnPassant === true && index === pawnGettingEnPassant) {
+                    } else if (canEnPassant === true && index === pawnGettingEnPassant && validSquare === squareToEnPassant) {
                         square = "";
                         return square
                     } else if (index === selectedPiece) {
@@ -741,11 +742,8 @@ function GameBoard() {
                         return square;
                     }
                 })
-                if(canEnPassant === true) {
-                    setCanEnPassant(false);
-                    setPawnThatCanEnPassant(null);
-                    setSquareToEnPassant(null);
-                    setPawnGettingEnPassant(null);
+                if (canEnPassant === true) {
+                    resetEnPassant()
                 }
                 return newBoard;
             })
