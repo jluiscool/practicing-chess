@@ -36,8 +36,8 @@ function GameBoard() {
     const [hasWhiteKingMoved, setHasWhiteKingMoved] = useState(false);
     const [hasBlackKingMoved, setHasBlackKingMoved] = useState(false);
 
-    const [canWhiteCastle, setCanWhiteCastle] = useState(true);
-    const [canBlackCastle, setCanBlackCastle] = useState(true);
+    // const [canWhiteCastle, setCanWhiteCastle] = useState(true);
+    // const [canBlackCastle, setCanBlackCastle] = useState(true);
 
     const [canEnPassant, setCanEnPassant] = useState(false);
 
@@ -117,6 +117,17 @@ function GameBoard() {
             WhiteRook, WhiteKnight, WhiteBishop, WhiteQueen, WhiteKing, WhiteBishop, WhiteKnight, WhiteRook
         ]
     )
+
+    const seeAttackingSquares = useCallback((attackingPlayer, table = board) => {
+        let attackedSquaresArr = [];
+
+        for (let i = 0; i < table.length; i++) {
+            if (typeof table[i] === 'object' && table[i].player === attackingPlayer) {
+                attackedSquaresArr.push(...handleThisPiece(i, table));
+            }
+        }
+        return attackedSquaresArr;
+    }, []);
 
     function changeColor(index) {
         let color = '';
@@ -494,7 +505,7 @@ function GameBoard() {
 
             return movesArr;
         }
-        , [board, hasWhiteKingMoved, playerTurn, whiteRightRookMoved])
+        , [board, hasWhiteKingMoved, playerTurn, whiteRightRookMoved, blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, hasBlackKingMoved, seeAttackingSquares, whiteIsInCheck, whiteLeftRookMoved])
 
     const knightMoves = useCallback(
         function knightMoves(piece, square, table = board) {
@@ -560,18 +571,6 @@ function GameBoard() {
             }
             return potentialMoves;
         }, [bishopMoves, kingMoves, knightMoves, pawnMoves, queenMoves, rookMoves, board]);
-
-    const seeAttackingSquares = useCallback(
-        function seeAttackingSquares(attackingPlayer, table = board) {
-            let attackedSquaresArr = [];
-
-            for (let i = 0; i < table.length; i++) {
-                if (typeof table[i] === "object" && table[i].player === attackingPlayer) {
-                    attackedSquaresArr.push(...handleThisPiece(i, table))
-                }
-            }
-            return attackedSquaresArr;
-        }, [board, handleThisPiece])
 
     function movePiece(squareToMoveTo, table = board) {
         let validSquare;
@@ -824,7 +823,7 @@ function GameBoard() {
     useEffect(() => {
         if (whiteKingSquare !== 60) {
             setHasWhiteKingMoved(true)
-            setCanWhiteCastle(false)
+            // setCanWhiteCastle(false)
         }
     }, [whiteKingSquare])
 
@@ -832,7 +831,7 @@ function GameBoard() {
     useEffect(() => {
         if (blackKingSquare !== 4) {
             setHasBlackKingMoved(true)
-            setCanBlackCastle(false)
+            // setCanBlackCastle(false)
         }
     }, [blackKingSquare])
 
