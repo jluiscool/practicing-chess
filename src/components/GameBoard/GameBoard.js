@@ -40,6 +40,9 @@ function GameBoard() {
     // const [canBlackCastle, setCanBlackCastle] = useState(true);
 
     const [canEnPassant, setCanEnPassant] = useState(false);
+    const [pawnThatCanEnPassant, setPawnThatCanEnPassant] = useState(null);
+    const [squareToEnPassant, setSquareToEnPassant] = useState(null)
+    const [pawnGettingEnPassant, setPawnGettingEnPassant] = useState(null)
 
     const ranks = 8;
     // const files = 8;
@@ -208,11 +211,9 @@ function GameBoard() {
                 if (typeof table[index - 9] === "object" && table[index - 9].player === 'black' && checkNewFileDiff(index - 9, index, 1)) {
                     possibleMovesArr.push(index - 9);
                 }
+
             }
             if (piece.player === 'black') {
-                // if (index / 8 < 2 && index / 8 >= 1) {
-                //     console.log('Im in my starting rank')
-                // }
                 if (1 <= index / ranks && index / ranks < 2 && table[index + 8] === "") {
                     possibleMovesArr.push(index + 8);
                     if (table[index + 16] === "")
@@ -228,6 +229,12 @@ function GameBoard() {
                     possibleMovesArr.push(index + 9);
                 }
             }
+
+            //en passant
+            if (canEnPassant === true && index === pawnThatCanEnPassant) {
+                possibleMovesArr.push(squareToEnPassant)
+            }
+
             return possibleMovesArr;
         }, [board])
 
@@ -583,6 +590,45 @@ function GameBoard() {
             return;
         }
         if (typeof validSquare === 'number' && playerTurn === table[selectedPiece].player && table === board) {
+
+            //set en passant logic
+            if (board[selectedPiece].piece === "Pawn") {
+                //black pawn
+                if (board[selectedPiece].player === "black" && selectedPiece / 8 >= 1 && selectedPiece / 8 < 2) {
+                    if (board[validSquare + 1].player === "white" && board[validSquare + 1].piece === "Pawn") {
+                        console.log(`There is a white pawn to my right`)
+                        setCanEnPassant(true)
+                        setPawnThatCanEnPassant(validSquare + 1)
+                        setSquareToEnPassant(validSquare - 8)
+                        setPawnGettingEnPassant(validSquare)
+                    }
+                    if (board[validSquare - 1].player === "white" && board[validSquare - 1].piece === "Pawn") {
+                        console.log(`There is a white pawn to my left`)
+                        setCanEnPassant(true)
+                        setPawnThatCanEnPassant(validSquare - 1)
+                        setSquareToEnPassant(validSquare - 8)
+                        setPawnGettingEnPassant(validSquare)
+                    }
+                }
+                //white pawn
+                if (board[selectedPiece].player === "white" && selectedPiece / 8 >= 6 && selectedPiece / 8 < 7) {
+                    if (board[validSquare + 1].player === "black" && board[validSquare + 1].piece === "Pawn") {
+                        console.log(`There is a black pawn to my right`)
+                        setCanEnPassant(true)
+                        setPawnThatCanEnPassant(validSquare + 1)
+                        setSquareToEnPassant(validSquare + 8)
+                        setPawnGettingEnPassant(validSquare)
+                    }
+                    if (board[validSquare - 1].player === "black" && board[validSquare - 1].piece === "Pawn") {
+                        console.log(`There is a black pawn to my left`)
+                        setCanEnPassant(true)
+                        setPawnThatCanEnPassant(validSquare - 1)
+                        setSquareToEnPassant(validSquare + 8)
+                        setPawnGettingEnPassant(validSquare)
+                    }
+                }
+            }
+
             //castling white, left
             if (validSquare === 58 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "white") {
                 setBoard((prev) => {
@@ -600,6 +646,9 @@ function GameBoard() {
                             return square;
                         }
                     })
+                    setCanEnPassant(false);
+                    setPawnThatCanEnPassant(null);
+                    setSquareToEnPassant(null);
                     return newBoard;
                 })
             }
@@ -621,6 +670,9 @@ function GameBoard() {
                             return square;
                         }
                     })
+                    setCanEnPassant(false);
+                    setPawnThatCanEnPassant(null);
+                    setSquareToEnPassant(null);
                     return newBoard;
                 })
             }
@@ -642,6 +694,9 @@ function GameBoard() {
                             return square;
                         }
                     })
+                    setCanEnPassant(false);
+                    setPawnThatCanEnPassant(null);
+                    setSquareToEnPassant(null);
                     return newBoard;
                 })
             }
@@ -663,15 +718,22 @@ function GameBoard() {
                             return square;
                         }
                     })
+                    setCanEnPassant(false);
+                    setPawnThatCanEnPassant(null);
+                    setSquareToEnPassant(null);
                     return newBoard;
                 })
             }
 
+            //regular move
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
                     if (index === validSquare) {
                         square = table[selectedPiece];
                         return square;
+                    } else if (canEnPassant === true && index === pawnGettingEnPassant) {
+                        square = "";
+                        return square
                     } else if (index === selectedPiece) {
                         square = "";
                         return square;
@@ -679,6 +741,12 @@ function GameBoard() {
                         return square;
                     }
                 })
+                if(canEnPassant === true) {
+                    setCanEnPassant(false);
+                    setPawnThatCanEnPassant(null);
+                    setSquareToEnPassant(null);
+                    setPawnGettingEnPassant(null);
+                }
                 return newBoard;
             })
             if (playerTurn === 'white') {
@@ -914,6 +982,13 @@ function GameBoard() {
         }
 
     }, [board, blackIsInCheck, whiteIsInCheck, findAllPlayerPieces, findEveryLegalMove, findOppPlayer, playerTurn])
+
+    //check what pawn can en passant
+    useEffect(() => {
+        console.log(canEnPassant)
+        console.log(pawnThatCanEnPassant)
+        console.log(squareToEnPassant)
+    }, [board])
 
     return (
         <div className='gameboard'>
