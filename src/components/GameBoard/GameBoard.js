@@ -39,11 +39,7 @@ function GameBoard() {
     const [canWhiteCastle, setCanWhiteCastle] = useState(true);
     const [canBlackCastle, setCanBlackCastle] = useState(true);
 
-    const [whiteCastled, setWhiteCastled] = useState(false);
-    const [blackCastled, setBlackCastled] = useState(false);
-
-    // const [whiteIsCheckmated, setWhiteIsCheckmated] = useState(false);
-    // const [blackIsCheckmated, setBlackIsCheckmated] = useState(false);
+    const [canEnPassant, setCanEnPassant] = useState(false);
 
     const ranks = 8;
     // const files = 8;
@@ -203,6 +199,9 @@ function GameBoard() {
                 }
             }
             if (piece.player === 'black') {
+                // if (index / 8 < 2 && index / 8 >= 1) {
+                //     console.log('Im in my starting rank')
+                // }
                 if (1 <= index / ranks && index / ranks < 2 && table[index + 8] === "") {
                     possibleMovesArr.push(index + 8);
                     if (table[index + 16] === "")
@@ -795,7 +794,6 @@ function GameBoard() {
         }
         return everyLegalMove;
     }, [board, findLegalMoves, handleThisPiece])
-
 
 
     //handle clicking on a piece
