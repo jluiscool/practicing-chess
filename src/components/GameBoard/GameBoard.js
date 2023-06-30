@@ -398,6 +398,8 @@ function GameBoard() {
             let whiteLeftCastleSquare = 58;
             let blackRightCastleSquare = 6;
             let blackLeftCastleSquare = 2;
+            let canWhiteCastleRight = true;
+            let canWhiteCastleLeft = true;
 
             // going down
             for (let i = square + 7; i < square + 10 && i < 64; i++) {
@@ -455,20 +457,40 @@ function GameBoard() {
                 movesArr.push(leftMove);
             }
 
-            //white castle
-            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string") {
-                movesArr.push(whiteRightCastleSquare)
+            function checkIfBetweenSquareIsAttacked(player, squareBeingChecked) {
+                let betweenSquareIsAttacked = false;
+                let enemyAttackedSquares = seeAttackingSquares(player);
+                for (let i = 0; i < enemyAttackedSquares.length; i++) {
+                    if (enemyAttackedSquares[i] === squareBeingChecked) {
+                        betweenSquareIsAttacked = true;
+                    }
+                }
+                return betweenSquareIsAttacked;
             }
-            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteLeftRookMoved === false && typeof table[59] === "string" && typeof table[58] === "string" && typeof table[57] === "string") {
-                movesArr.push(whiteLeftCastleSquare)
+
+            //white castle
+            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string" && !whiteIsInCheck) {
+                if (!checkIfBetweenSquareIsAttacked("black", 61)) {
+                    movesArr.push(whiteRightCastleSquare)
+                }
+            }
+
+            if (table[square].player === "white" && hasWhiteKingMoved === false && whiteLeftRookMoved === false && typeof table[59] === "string" && typeof table[58] === "string" && typeof table[57] === "string" && !whiteIsInCheck) {
+                if (!checkIfBetweenSquareIsAttacked("black", 59)) {
+                    movesArr.push(whiteLeftCastleSquare)
+                }
             }
 
             //black castle
-            if (table[square].player === "black" && hasBlackKingMoved === false && blackRightRookMoved === false && typeof table[5] === "string" && typeof table[6] === "string") {
-                movesArr.push(blackRightCastleSquare)
+            if (table[square].player === "black" && hasBlackKingMoved === false && blackRightRookMoved === false && typeof table[5] === "string" && typeof table[6] === "string" && !blackIsInCheck) {
+                if (!checkIfBetweenSquareIsAttacked("white", 5)) {
+                    movesArr.push(blackRightCastleSquare)
+                }
             }
-            if (table[square].player === "black" && hasBlackKingMoved === false && blackLeftRookMoved === false && typeof table[3] === "string" && typeof table[2] === "string" && typeof table[1] === "string") {
-                movesArr.push(blackLeftCastleSquare)
+            if (table[square].player === "black" && hasBlackKingMoved === false && blackLeftRookMoved === false && typeof table[3] === "string" && typeof table[2] === "string" && typeof table[1] === "string" && !blackIsInCheck) {
+                if (!checkIfBetweenSquareIsAttacked("white", 5)) {
+                    movesArr.push(blackLeftCastleSquare)
+                }
             }
 
             return movesArr;
@@ -576,7 +598,7 @@ function GameBoard() {
                         } else if (index === 56) {
                             square = ""
                             return square;
-                        }else {
+                        } else {
                             return square;
                         }
                     })
@@ -597,7 +619,7 @@ function GameBoard() {
                         } else if (index === 63) {
                             square = ""
                             return square;
-                        }else {
+                        } else {
                             return square;
                         }
                     })
@@ -618,7 +640,7 @@ function GameBoard() {
                         } else if (index === 7) {
                             square = ""
                             return square;
-                        }else {
+                        } else {
                             return square;
                         }
                     })
@@ -639,7 +661,7 @@ function GameBoard() {
                         } else if (index === 0) {
                             square = ""
                             return square;
-                        }else {
+                        } else {
                             return square;
                         }
                     })
