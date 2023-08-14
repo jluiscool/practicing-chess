@@ -528,24 +528,24 @@ function GameBoard() {
     //             }
     //         }
     //     }
-        // if (player === "white") {
-        //     for (let i = 0; i < squaresAttackedByWhite.length; i++) {
-        //         if (squaresAttackedByWhite[i] === squareBeingChecked) {
-        //             betweenSquareIsAttacked = true;
-        //             console.log(`The square ${squareBeingChecked} is being attacked`)
-        //         } else {
-        //             console.log(`${squareBeingChecked}`)
-        //         }
-        //     }
-        // }
-        // if (player === "black") {
-        //     console.log(`These are the squares attacked by black: ${squaresAttackedByBlack}`)
-        //     for (let i = 0; i < squaresAttackedByBlack.length; i++) {
-        //         if (squaresAttackedByBlack[i] === squareBeingChecked) {
-        //             betweenSquareIsAttacked = true;
-        //         }
-        //     }
-        // }
+    // if (player === "white") {
+    //     for (let i = 0; i < squaresAttackedByWhite.length; i++) {
+    //         if (squaresAttackedByWhite[i] === squareBeingChecked) {
+    //             betweenSquareIsAttacked = true;
+    //             console.log(`The square ${squareBeingChecked} is being attacked`)
+    //         } else {
+    //             console.log(`${squareBeingChecked}`)
+    //         }
+    //     }
+    // }
+    // if (player === "black") {
+    //     console.log(`These are the squares attacked by black: ${squaresAttackedByBlack}`)
+    //     for (let i = 0; i < squaresAttackedByBlack.length; i++) {
+    //         if (squaresAttackedByBlack[i] === squareBeingChecked) {
+    //             betweenSquareIsAttacked = true;
+    //         }
+    //     }
+    // }
 
     //     console.log(betweenSquareIsAttacked)
     //     return betweenSquareIsAttacked;
@@ -561,19 +561,19 @@ function GameBoard() {
 
         //white castle
         if (table[square].player === "white" && hasWhiteKingMoved === false && whiteRightRookMoved === false && typeof table[61] === "string" && typeof table[62] === "string" && !whiteIsInCheck) {
-                movesArr.push(whiteRightCastleSquare)
+            movesArr.push(whiteRightCastleSquare)
         }
 
         if (table[square].player === "white" && hasWhiteKingMoved === false && whiteLeftRookMoved === false && typeof table[59] === "string" && typeof table[58] === "string" && typeof table[57] === "string" && !whiteIsInCheck) {
-                movesArr.push(whiteLeftCastleSquare)
+            movesArr.push(whiteLeftCastleSquare)
         }
 
         // //black castle
         if (table[square].player === "black" && hasBlackKingMoved === false && blackRightRookMoved === false && typeof table[5] === "string" && typeof table[6] === "string" && !blackIsInCheck) {
-                movesArr.push(blackRightCastleSquare)
+            movesArr.push(blackRightCastleSquare)
         }
         if (table[square].player === "black" && hasBlackKingMoved === false && blackLeftRookMoved === false && typeof table[3] === "string" && typeof table[2] === "string" && typeof table[1] === "string" && !blackIsInCheck) {
-                movesArr.push(blackLeftCastleSquare)
+            movesArr.push(blackLeftCastleSquare)
         }
         return movesArr
     }, [blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, board, hasBlackKingMoved, hasWhiteKingMoved, whiteIsInCheck, whiteLeftRookMoved, whiteRightRookMoved])
@@ -881,23 +881,49 @@ function GameBoard() {
     }, [])
 
     const findLegalMoves = useCallback((movesArr, oppPlayer, pieceToMove) => {
-        let storedMovesArr = [...movesArr];
+        let possibleMovesArr = [...movesArr];
         let filteredMoves = []
-        // console.log(movesArr)
-        for (let i = 0; i < storedMovesArr.length; i++) {
+        console.log(board[pieceToMove].piece)
+        for (let i = 0; i < possibleMovesArr.length; i++) {
             // returns new board
-            let testBoard = changeNextMoveBoard(storedMovesArr[i], pieceToMove);
+            let testBoard = changeNextMoveBoard(possibleMovesArr[i], pieceToMove);
             // returns array of squares being attacked by player
             let oppFutureAttackingMoves = seeAttackingSquares(oppPlayer, testBoard)
-            // console.log(oppFutureAttackingMoves)
             if (checkIfPlayerIsInCheck(findOppPlayer(oppPlayer), oppFutureAttackingMoves, testBoard)) {
-
-            } else if (board[pieceToMove].piece === "King" && board[pieceToMove].player === "black" && checkIfSquareIsInCheck(seeAttackingSquares(oppPlayer), storedMovesArr[i])) {
-                console.log(`This square ${i} is being attacked`)
+                if (board[pieceToMove].piece === "King" && board[pieceToMove].player === "black") {
+                    if (oppFutureAttackingMoves.includes(5)) {
+                        possibleMovesArr = possibleMovesArr.filter((num) => {
+                            return (
+                                num !== 6
+                            )
+                        })
+                    } else if (oppFutureAttackingMoves.includes(3)) {
+                        possibleMovesArr = possibleMovesArr.filter((num) => {
+                            return (
+                                num !== 2
+                            )
+                        })
+                    }
+                } if (board[pieceToMove].piece === "King" && board[pieceToMove].player === "white") {
+                    if (oppFutureAttackingMoves.includes(61)) {
+                        possibleMovesArr = possibleMovesArr.filter((num) => {
+                            return (
+                                num !== 62
+                            )
+                        })
+                    } else if (oppFutureAttackingMoves.includes(59)) {
+                        possibleMovesArr = possibleMovesArr.filter((num) => {
+                            return (
+                                num !== 58
+                            )
+                        })
+                    }
+                }
             } else {
-                filteredMoves.push(storedMovesArr[i])
+                filteredMoves.push(possibleMovesArr[i])
             }
         }
+        console.log(filteredMoves)
         return filteredMoves;
     }, [changeNextMoveBoard, checkIfPlayerIsInCheck, findOppPlayer, seeAttackingSquares])
 
