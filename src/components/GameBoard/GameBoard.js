@@ -3,11 +3,12 @@ import './GameBoard.scss'
 import { useEffect, useState, useCallback } from 'react';
 
 import Square from '../Square/Square';
+import PromotionModal from '../PromotionModal/PromotionModal'
 const _ = require('lodash');
 
 function GameBoard() {
 
-    const [playerTurn, setPlayerTurn] = useState('white');
+    const [playerTurn, setPlayerTurn] = useState('black');
 
     const [selectedPiece, setSelectedPiece] = useState(null);
 
@@ -41,7 +42,8 @@ function GameBoard() {
     const [squareToEnPassant, setSquareToEnPassant] = useState(null)
     const [pawnGettingEnPassant, setPawnGettingEnPassant] = useState(null)
 
-    // const [pawnPromotion, setPawnPromotion] = useState(false);
+    const [pawnPromotion, setPawnPromotion] = useState(false);
+    const [pawnPromotionSquare, setPawnPromotionSquare] = useState(null)
 
     const ranks = 8;
     // const files = 8;
@@ -502,55 +504,6 @@ function GameBoard() {
         }
         , [board])
 
-    // const checkIfBetweenSquareIsAttacked = useCallback((player, squareBeingChecked) => {
-    //     let betweenSquareIsAttacked = false;
-    //     let attackedSquaresArr = [];
-    //     if (player === "white") {
-    //         attackedSquaresArr = seeAttackingSquares(player)
-    //         console.log(attackedSquaresArr)
-    //         for (let i = 0; i < attackedSquaresArr.length; i++) {
-    //             if (attackedSquaresArr[i] === squareBeingChecked) {
-    //                 betweenSquareIsAttacked = true;
-    //                 console.log(`The square ${squareBeingChecked} is being attacked`)
-    //             } else {
-    //                 console.log(`${squareBeingChecked}`)
-    //             }
-    //         }
-    //     }
-    //     if (player === "black") {
-    //         attackedSquaresArr = seeAttackingSquares(player)
-    //         for (let i = 0; i < attackedSquaresArr.length; i++) {
-    //             if (attackedSquaresArr[i] === squareBeingChecked) {
-    //                 betweenSquareIsAttacked = true;
-    //                 console.log(`The square ${squareBeingChecked} is being attacked`)
-    //             } else {
-    //                 console.log(`${squareBeingChecked}`)
-    //             }
-    //         }
-    //     }
-    // if (player === "white") {
-    //     for (let i = 0; i < squaresAttackedByWhite.length; i++) {
-    //         if (squaresAttackedByWhite[i] === squareBeingChecked) {
-    //             betweenSquareIsAttacked = true;
-    //             console.log(`The square ${squareBeingChecked} is being attacked`)
-    //         } else {
-    //             console.log(`${squareBeingChecked}`)
-    //         }
-    //     }
-    // }
-    // if (player === "black") {
-    //     console.log(`These are the squares attacked by black: ${squaresAttackedByBlack}`)
-    //     for (let i = 0; i < squaresAttackedByBlack.length; i++) {
-    //         if (squaresAttackedByBlack[i] === squareBeingChecked) {
-    //             betweenSquareIsAttacked = true;
-    //         }
-    //     }
-    // }
-
-    //     console.log(betweenSquareIsAttacked)
-    //     return betweenSquareIsAttacked;
-    // }, [])
-
     const canKingCastle = useCallback((piece, square, table = board) => {
         let movesArr = [];
 
@@ -635,20 +588,18 @@ function GameBoard() {
             return;
         }
         if (typeof validSquare === 'number' && playerTurn === table[selectedPiece].player && table === board) {
-
             //set en passant logic
             if (board[selectedPiece].piece === "Pawn") {
+                //en passant
                 //black pawn
                 if (board[selectedPiece].player === "black" && selectedPiece / 8 >= 1 && selectedPiece / 8 < 2) {
                     if (board[validSquare + 1].player === "white" && board[validSquare + 1].piece === "Pawn") {
-                        console.log(`There is a white pawn to my right`)
                         setCanEnPassant(true)
                         setPawnThatCanEnPassant(validSquare + 1)
                         setSquareToEnPassant(validSquare - 8)
                         setPawnGettingEnPassant(validSquare)
                     }
                     if (board[validSquare - 1].player === "white" && board[validSquare - 1].piece === "Pawn") {
-                        console.log(`There is a white pawn to my left`)
                         setCanEnPassant(true)
                         setPawnThatCanEnPassant(validSquare - 1)
                         setSquareToEnPassant(validSquare - 8)
@@ -658,14 +609,12 @@ function GameBoard() {
                 //white pawn
                 if (board[selectedPiece].player === "white" && selectedPiece / 8 >= 6 && selectedPiece / 8 < 7) {
                     if (board[validSquare + 1].player === "black" && board[validSquare + 1].piece === "Pawn") {
-                        console.log(`There is a black pawn to my right`)
                         setCanEnPassant(true)
                         setPawnThatCanEnPassant(validSquare + 1)
                         setSquareToEnPassant(validSquare + 8)
                         setPawnGettingEnPassant(validSquare)
                     }
                     if (board[validSquare - 1].player === "black" && board[validSquare - 1].piece === "Pawn") {
-                        console.log(`There is a black pawn to my left`)
                         setCanEnPassant(true)
                         setPawnThatCanEnPassant(validSquare - 1)
                         setSquareToEnPassant(validSquare + 8)
@@ -765,6 +714,7 @@ function GameBoard() {
             //regular move
             setBoard((prev) => {
                 let newBoard = prev.map((square, index) => {
+                    // console.log(selectedPiece)
                     if (index === validSquare) {
                         square = table[selectedPiece];
                         return square;
@@ -783,16 +733,27 @@ function GameBoard() {
                 }
                 return newBoard;
             })
-            if (playerTurn === 'white') {
-                setPlayerTurn('black')
-            } else if (playerTurn === "black") {
-                setPlayerTurn('white')
+            if (board[selectedPiece].piece === "Pawn" && board[selectedPiece].player === "white" && squareToMoveTo < 8) {
+                console.log('you are now promoting as white')
+                setPawnPromotion(true)
+            } else if (board[selectedPiece].piece === "Pawn" && board[selectedPiece].player === "black" && squareToMoveTo > 55) {
+                console.log('you are now promoting as black')
+                setPawnPromotion(true)
             }
-            setSelectedPiece(null)
         } else {
             return;
         }
     }
+
+    //change player turn, reset selectedPiece
+    useEffect(() => {
+        if (playerTurn === 'white') {
+            setPlayerTurn('black')
+        } else if (playerTurn === "black") {
+            setPlayerTurn('white')
+        }
+        setSelectedPiece(null)
+    }, [board])
 
     // returns a board in an array with the simulated move
     const changeNextMoveBoard = useCallback((squareToMoveTo, pieceToMove) => {
@@ -883,7 +844,6 @@ function GameBoard() {
     const findLegalMoves = useCallback((movesArr, oppPlayer, pieceToMove) => {
         let possibleMovesArr = [...movesArr];
         let filteredMoves = []
-        console.log(board[pieceToMove].piece)
         for (let i = 0; i < possibleMovesArr.length; i++) {
             // returns new board
             let testBoard = changeNextMoveBoard(possibleMovesArr[i], pieceToMove);
@@ -923,7 +883,6 @@ function GameBoard() {
                 filteredMoves.push(possibleMovesArr[i])
             }
         }
-        console.log(filteredMoves)
         return filteredMoves;
     }, [changeNextMoveBoard, checkIfPlayerIsInCheck, findOppPlayer, seeAttackingSquares])
 
@@ -935,6 +894,46 @@ function GameBoard() {
         }
         return everyLegalMove;
     }, [board, findLegalMoves, handleThisPiece])
+
+    function handlePawnPromote() {
+        if (selectedPiece.player === "black") {
+            for (let i = 0; i < 8; i++) {
+                if (board[i].piece === "Pawn") {
+                    console.log(board[i].piece)
+                    setPawnPromotion(true)
+                    setPawnPromotionSquare(i)
+                    console.log('you are now promoting a pawn')
+                }
+            }
+        } else if (selectedPiece.player === "white") {
+            for (let i = 56; i < 8; i++) {
+                if (board[i].piece === "Pawn") {
+                    console.log(board[i].piece)
+                    setPawnPromotion(true)
+                    setPawnPromotionSquare(i)
+                    console.log('you are now promoting a pawn')
+                }
+            }
+        }
+    }
+
+
+    function choosePromotionPiece(promotionPiece) {
+        // setBoard((prev) => {
+        //     prev.map((square, index) => {
+        //         if (index === pawnPromotionSquare) {
+        //             console.log(square)
+        //             return square
+        //         } else {
+        //             return square
+        //         }
+        //     })
+        // })
+        setPawnPromotion(false)
+        setPawnPromotionSquare(null)
+        console.log(promotionPiece)
+    }
+
 
 
     //handle clicking on a piece
@@ -1009,27 +1008,21 @@ function GameBoard() {
         }
     }, [board, checkIfPieceMoved])
 
-    //set player's attacking squares
-    // useEffect(() => {
-    //     setSquaresAttackedByBlack(seeAttackingSquares("black"))
-    //     setSquaresAttackedByWhite(seeAttackingSquares("white"))
-    // }, [seeAttackingSquares])
-
     //check if player is in check
     useEffect(() => {
         setWhiteIsInCheck(checkIfPlayerIsInCheck("white", seeAttackingSquares("black")))
         setBlackIsInCheck(checkIfPlayerIsInCheck("black", seeAttackingSquares("white")))
     }, [checkIfPlayerIsInCheck, board, seeAttackingSquares])
 
-    useEffect(() => {
-        if (whiteIsInCheck) {
-            console.log(`white is in check`)
-        }
-        if (blackIsInCheck) {
-            console.log(`black is in check`)
-
-        }
-    }, [whiteIsInCheck, blackIsInCheck])
+    /*     useEffect(() => {
+            if (whiteIsInCheck) {
+                console.log(`white is in check`)
+            }
+            if (blackIsInCheck) {
+                console.log(`black is in check`)
+     
+            }
+        }, [whiteIsInCheck, blackIsInCheck]) */
 
     //checks for checkmate
     useEffect(() => {
@@ -1069,6 +1062,7 @@ function GameBoard() {
 
     return (
         <div className='gameboard'>
+            {pawnPromotion ? <PromotionModal playerColor={findOppPlayer(playerTurn)} choosePromotionPiece={choosePromotionPiece} /> : false}
             {
                 board.map((square, index) => {
                     return (
