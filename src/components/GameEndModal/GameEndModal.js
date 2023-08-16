@@ -1,4 +1,4 @@
-import './GameStartModal.scss'
+import './GameEndModal.scss'
 
 function GameStartModal({ handleNewGame }) {
     return (

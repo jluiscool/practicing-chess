@@ -898,29 +898,6 @@ function GameBoard() {
         return everyLegalMove;
     }, [board, findLegalMoves, handleThisPiece])
 
-    function handlePawnPromote() {
-        if (selectedPiece.player === "black") {
-            for (let i = 0; i < 8; i++) {
-                if (board[i].piece === "Pawn") {
-                    console.log(board[i].piece)
-                    setPawnPromotion(true)
-                    setPawnPromotionSquare(i)
-                    console.log('you are now promoting a pawn')
-                }
-            }
-        } else if (selectedPiece.player === "white") {
-            for (let i = 56; i < 8; i++) {
-                if (board[i].piece === "Pawn") {
-                    console.log(board[i].piece)
-                    setPawnPromotion(true)
-                    setPawnPromotionSquare(i)
-                    console.log('you are now promoting a pawn')
-                }
-            }
-        }
-    }
-
-
     function choosePromotionPiece(promotionPiece) {
         setBoard((prevBoard) => {
             let newBoard = prevBoard.map((square, index) => {
@@ -1028,16 +1005,6 @@ function GameBoard() {
         setBlackIsInCheck(checkIfPlayerIsInCheck("black", seeAttackingSquares("white")))
     }, [checkIfPlayerIsInCheck, board, seeAttackingSquares])
 
-    /*     useEffect(() => {
-            if (whiteIsInCheck) {
-                console.log(`white is in check`)
-            }
-            if (blackIsInCheck) {
-                console.log(`black is in check`)
-     
-            }
-        }, [whiteIsInCheck, blackIsInCheck]) */
-
     //checks for checkmate
     useEffect(() => {
         if (blackIsInCheck) {
@@ -1077,7 +1044,7 @@ function GameBoard() {
     return (
         <div className='gameboard'>
             {pawnPromotion ? <PromotionModal playerColor={findOppPlayer(playerTurn)} choosePromotionPiece={choosePromotionPiece} /> : false}
-            <div className='gameboard-squares'>
+            <div className={`gameboard-squares ${playerTurn === "black" ? "flip": ""}`}>
                 {
                     board.map((square, index) => {
                         return (
@@ -1092,6 +1059,7 @@ function GameBoard() {
                                 movePiece={movePiece}
                                 isWhiteKingInCheck={whiteIsInCheck ? whiteKingSquare : false}
                                 isBlackKingInCheck={blackIsInCheck ? blackKingSquare : false}
+                                playerTurn={playerTurn}
                             />
                         )
                     })

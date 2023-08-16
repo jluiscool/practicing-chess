@@ -7,7 +7,7 @@ import Knight from '../Pieces/Knight';
 import Queen from '../Pieces/Queen';
 import King from '../Pieces/King';
 
-function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possibleMoves, movePiece, isWhiteKingInCheck, isBlackKingInCheck }) {
+function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possibleMoves, movePiece, isWhiteKingInCheck, isBlackKingInCheck, playerTurn }) {
 
     const validMove = useCallback(() => {
         for (let i = 0; i < possibleMoves.length; i++) {
@@ -39,6 +39,11 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
         }
         if (isWhiteKingInCheck === id || isBlackKingInCheck === id) {
             classname += " highlighted-check"
+        }
+        if (playerTurn === "black") {
+            classname += " flip"
+        } else {
+
         }
         return classname;
     }
@@ -80,16 +85,23 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
 
     function renderRank(index) {
         let renderRank;
-        if (index % 8 === 0) {
+        if (index % 8 === 0 && playerTurn === "white") {
             renderRank = ((index - 64) * -1) / 8
-        };
+        }
+        if (index % 8 === 7 && playerTurn === "black") {
+            renderRank = (index + 1) / 8;
+        }
+
         return renderRank;
     }
 
     function renderFile(index) {
         let renderFile;
-        if (index > 55) {
+        if (index > 55 && playerTurn === "white") {
             renderFile = String.fromCharCode(96 + index - 55);
+        };
+        if (index < 8 && playerTurn === "black") {
+            renderFile = String.fromCharCode(96 + index + 1);
         };
         return renderFile;
     }

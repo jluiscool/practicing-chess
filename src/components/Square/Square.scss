@@ -11,7 +11,7 @@
         justify-content: center;
         align-items: center;
         position: relative;
-        z-index:100;
+        z-index: 100;
     }
 
     &__file {
@@ -45,4 +45,10 @@
 
 .brown {
     background-color: rgb(73, 217, 228);
+}
+
+.flip {
+    transform: rotate(180deg);
+    /* Rotate the element 180 degrees */
+    /* Set the rotation origin */
 }
