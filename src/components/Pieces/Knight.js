@@ -6,7 +6,7 @@ import './Knight.scss'
 function Knight({playerColor}) {
     return (
         <div className="knight">
-            <img src={playerColor === 'white' ? WhiteKnight : BlackKnight} alt="knight"/>
+            <img src={playerColor === 'white' ? WhiteKnight : BlackKnight} alt="knight" className='knight__piece'/>
         </div>
     )
 }

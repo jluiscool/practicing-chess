@@ -6,7 +6,7 @@ import './Queen.scss'
 function Queen({playerColor}) {
     return (
         <div className="queen">
-            <img src={playerColor === 'white' ? WhiteQueen : BlackQueen} alt="queen"/>
+            <img src={playerColor === 'white' ? WhiteQueen : BlackQueen} alt="queen" className='queen__piece'/>
         </div>
     )
 }

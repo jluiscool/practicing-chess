@@ -62,22 +62,48 @@ function Square({ piece, backgroundColor, id, selectAPiece, selectedPiece, possi
         if (component === 'Pawn') {
             return <Pawn playerColor={player} />
         }
+
+        if (component === "empty") {
+            return <div className='empty-square'></div>
+        }
     }
 
     function handleOnClick(e) {
-        if (e.target.childNodes.length === 2) {
+        // console.log(e.target.childNodes.length)
+        if (e.target.childNodes.length === 3) {
             selectAPiece(id)
-        } else if (e.target.childNodes.length < 2) {
+        } else if (e.target.childNodes.length < 3) {
             selectAPiece(null)
         }
         movePiece(id)
     }
 
+    function renderRank(index) {
+        let renderRank;
+        if (index % 8 === 0) {
+            renderRank = ((index - 64) * -1) / 8
+        };
+        return renderRank;
+    }
+
+    function renderFile(index) {
+        let renderFile;
+        if (index > 55) {
+            renderFile = String.fromCharCode(96 + index - 55);
+        };
+        return renderFile;
+    }
+
     return (
-        <div className={`square ${backgroundColor}`} >
-            <div className={addClassNames()} onClick={(e) => handleOnClick(e)} ref={squareRef}>
-                {piece ? renderComponent(piece.piece, piece.player) : ""}
-                <p className='square__index'>{id}</p>
+        <div className={`square ${backgroundColor}`}>
+            <div className={addClassNames()} onClick={(e) => {
+                e.stopPropagation(); // Stop the event from propagating to the outer div
+                handleOnClick(e);
+            }} ref={squareRef}>
+                {piece ? renderComponent(piece.piece, piece.player) : false}
+                {/* <p className='square__index'>{id}</p> */}
+                <p className='square__file'>{renderFile(id)}</p>
+                <p className='square__rank'>{renderRank(id)}</p>
             </div>
         </div>
     )

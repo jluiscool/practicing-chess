@@ -6,7 +6,7 @@ import './King.scss'
 function King({playerColor}) {
     return (
         <div className="king">
-            <img src={playerColor === 'white' ? WhiteKing : BlackKing} alt="king"/>
+            <img src={playerColor === 'white' ? WhiteKing : BlackKing} alt="king" className='king__piece'/>
         </div>
     )
 }

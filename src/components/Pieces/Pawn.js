@@ -7,7 +7,7 @@ function Pawn({ playerColor }) {
 
     return (
         <div className="pawn">
-            <img src={playerColor === 'white' ? WhitePawn : BlackPawn} alt="pawn" />
+            <img src={playerColor === 'white' ? WhitePawn : BlackPawn} alt="pawn" className='pawn__piece' />
         </div>
     )
 }

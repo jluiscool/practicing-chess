@@ -6,7 +6,7 @@ import './Bishop.scss'
 function Bishop({playerColor}) {
     return (
         <div className="bishop">
-            <img src={playerColor === 'white' ? WhiteBishop : BlackBIshop} alt="bishop"/>
+            <img src={playerColor === 'white' ? WhiteBishop : BlackBIshop} alt="bishop" className='bishop__piece'/>
         </div>
     )
 }

@@ -6,7 +6,7 @@ import './Rook.scss'
 function Rook({ playerColor }) {
     return (
         <div className="rook">
-            <img src={playerColor === 'white' ? WhiteRook : BlackRook} alt="rook"/>
+            <img src={playerColor === 'white' ? WhiteRook : BlackRook} alt="rook" className='rook__piece'/>
         </div>
     )
 }

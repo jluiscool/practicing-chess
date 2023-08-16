@@ -1,9 +1,24 @@
 .gameboard {
-    width: 100vw;
-    height: 100vw;
-    display: inline-flex;
+    width: 100%;
+    max-width: 500px;
+    max-height: 500px;
+    height: 100dvw;
+    display: flex;
+    // flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid black;
+    flex-wrap: wrap;
+}
+
+.gameboard-squares {
+    display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: flex-start;
-    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.game-state {
+    width: 100%;
 }
