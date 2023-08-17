@@ -435,6 +435,7 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
         , [board])
 
     const canKingCastle = useCallback((piece, square, table = board) => {
+        let castlingAvailable = true;
         let movesArr = [];
 
         let whiteRightCastleSquare = 62;
@@ -458,7 +459,12 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
         if (table[square].player === "black" && hasBlackKingMoved === false && blackLeftRookMoved === false && typeof table[3] === "string" && typeof table[2] === "string" && typeof table[1] === "string" && !blackIsInCheck) {
             movesArr.push(blackLeftCastleSquare)
         }
-        return movesArr
+        if (castlingAvailable === true) {
+            return movesArr;
+        } else {
+            return movesArr = [];
+        }
+        
     }, [blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, board, hasBlackKingMoved, hasWhiteKingMoved, whiteIsInCheck, whiteLeftRookMoved, whiteRightRookMoved])
 
     const allKingMoves = useCallback((piece, square, table) => {
@@ -555,7 +561,7 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
             }
 
             //castling white, left
-            if (validSquare === 58 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "white") {
+            if (validSquare === 58 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "white" && hasWhiteKingMoved === false) {
                 setBoard((prev) => {
                     let newBoard = prev.map((square, index) => {
                         if (index === validSquare) {
@@ -571,13 +577,12 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
                             return square;
                         }
                     })
-                    resetEnPassant()
                     return newBoard;
                 })
             }
 
             // castling white, right
-            if (validSquare === 62 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "white") {
+            if (validSquare === 62 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "white" && hasWhiteKingMoved === false) {
                 setBoard((prev) => {
                     let newBoard = prev.map((square, index) => {
                         if (index === validSquare) {
@@ -593,13 +598,12 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
                             return square;
                         }
                     })
-                    resetEnPassant()
                     return newBoard;
                 })
             }
 
             //castle black, right
-            if (validSquare === 6 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "black") {
+            if (validSquare === 6 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "black" && hasBlackKingMoved === false) {
                 setBoard((prev) => {
                     let newBoard = prev.map((square, index) => {
                         if (index === validSquare) {
@@ -615,13 +619,12 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
                             return square;
                         }
                     })
-                    resetEnPassant()
                     return newBoard;
                 })
             }
 
             //castle black, left
-            if (validSquare === 2 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "black") {
+            if (validSquare === 2 && table[selectedPiece].piece === "King" && table[selectedPiece].player === "black" && hasBlackKingMoved === false) {
                 setBoard((prev) => {
                     let newBoard = prev.map((square, index) => {
                         if (index === validSquare) {
@@ -637,7 +640,6 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
                             return square;
                         }
                     })
-                    resetEnPassant()
                     return newBoard;
                 })
             }
