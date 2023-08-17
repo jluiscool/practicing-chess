@@ -6,7 +6,7 @@ import Square from '../Square/Square';
 import PromotionModal from '../PromotionModal/PromotionModal'
 const _ = require('lodash');
 
-function GameBoard() {
+function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
 
     const [playerTurn, setPlayerTurn] = useState('black');
 
@@ -48,78 +48,8 @@ function GameBoard() {
     const ranks = 8;
     // const files = 8;
 
-    const BlackRook = {
-        player: 'black',
-        piece: 'Rook',
-        isSelected: false,
-    };
-    const BlackBishop = {
-        player: 'black',
-        piece: 'Bishop',
-        isSelected: false,
-    };
-    const BlackKnight = {
-        player: 'black',
-        piece: 'Knight',
-        isSelected: false,
-    };
-    const BlackQueen = {
-        player: 'black',
-        piece: 'Queen',
-        isSelected: false,
-    };
-    const BlackKing = {
-        player: 'black',
-        piece: 'King',
-        isSelected: false,
-    };
-    const BlackPawn = {
-        player: 'black',
-        piece: 'Pawn',
-        isSelected: false,
-    };
-    const WhiteRook = {
-        player: 'white',
-        piece: 'Rook',
-        isSelected: false,
-    };
-    const WhiteBishop = {
-        player: 'white',
-        piece: 'Bishop',
-        isSelected: false,
-    };
-    const WhiteKnight = {
-        player: 'white',
-        piece: 'Knight',
-        isSelected: false,
-    };
-    const WhiteQueen = {
-        player: 'white',
-        piece: 'Queen',
-        isSelected: false,
-    };
-    const WhiteKing = {
-        player: 'white',
-        piece: 'King',
-        isSelected: false,
-    };
-    const WhitePawn = {
-        player: 'white',
-        piece: 'Pawn',
-        isSelected: false,
-    };
-
     const [board, setBoard] = useState(
-        [
-            BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, BlackBishop, BlackKnight, BlackRook,
-            BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn,
-            '', '', '', '', '', '', '', '',
-            '', '', '', '', '', '', '', '',
-            '', '', '', '', '', '', '', '',
-            '', '', '', '', '', '', '', '',
-            WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn,
-            WhiteRook, WhiteKnight, WhiteBishop, WhiteQueen, WhiteKing, WhiteBishop, WhiteKnight, WhiteRook
-        ]
+        [...restartBoard]
     )
 
     function changeColor(index) {
@@ -581,6 +511,7 @@ function GameBoard() {
         let validSquare;
         if (typeof selectedPiece === 'number' && possibleMoves.length > 0) {
             for (let i = 0; i < possibleMoves.length; i++) {
+                console.log(possibleMoves)
                 if (squareToMoveTo === possibleMoves[i])
                     validSquare = possibleMoves[i]
             }
@@ -1041,10 +972,22 @@ function GameBoard() {
 
     }, [board, blackIsInCheck, whiteIsInCheck, findAllPlayerPieces, findEveryLegalMove, findOppPlayer, playerTurn])
 
+    useEffect(() => {
+        if (whiteIsInCheckmate || blackIsInCheckmate) {
+            handleGameEnd()
+        }
+    }, [whiteIsInCheckmate, blackIsInCheckmate])
+
+    useEffect(() => {
+        if (resetBoard) {
+            setBoard((prev) => [...restartBoard])
+        }
+    }, [resetBoard])
+
     return (
         <div className='gameboard'>
             {pawnPromotion ? <PromotionModal playerColor={findOppPlayer(playerTurn)} choosePromotionPiece={choosePromotionPiece} /> : false}
-            <div className={`gameboard-squares ${playerTurn === "black" ? "flip": ""}`}>
+            <div className={`gameboard-squares ${playerTurn === "black" ? "flip" : ""}`}>
                 {
                     board.map((square, index) => {
                         return (
