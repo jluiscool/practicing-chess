@@ -37,6 +37,7 @@ function GameBoard({ handleGameEnd, resetBoard, initiateBoard, handleResetBoard 
 
     // const [canWhiteCastle, setCanWhiteCastle] = useState(true);
     // const [canBlackCastle, setCanBlackCastle] = useState(true);
+    //handleResetBoard
 
     const [canEnPassant, setCanEnPassant] = useState(false);
     const [pawnThatCanEnPassant, setPawnThatCanEnPassant] = useState(null);
