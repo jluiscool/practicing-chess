@@ -4,9 +4,10 @@ import { useEffect, useState, useCallback } from 'react';
 
 import Square from '../Square/Square';
 import PromotionModal from '../PromotionModal/PromotionModal'
-const _ = require('lodash');
+// const _ = require('lodash');
+import * as _ from "lodash"
 
-function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
+function GameBoard({ handleGameEnd, resetBoard, initiateBoard, handleResetBoard }) {
 
     const [playerTurn, setPlayerTurn] = useState('black');
 
@@ -49,7 +50,7 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
     // const files = 8;
 
     const [board, setBoard] = useState(
-        [...restartBoard]
+        [...initiateBoard]
     )
 
     function changeColor(index) {
@@ -464,7 +465,7 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
         } else {
             return movesArr = [];
         }
-        
+
     }, [blackIsInCheck, blackLeftRookMoved, blackRightRookMoved, board, hasBlackKingMoved, hasWhiteKingMoved, whiteIsInCheck, whiteLeftRookMoved, whiteRightRookMoved])
 
     const allKingMoves = useCallback((piece, square, table) => {
@@ -975,15 +976,21 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
     }, [board, blackIsInCheck, whiteIsInCheck, findAllPlayerPieces, findEveryLegalMove, findOppPlayer, playerTurn])
 
     useEffect(() => {
-        if (whiteIsInCheckmate || blackIsInCheckmate) {
+        if (whiteIsInCheckmate) {
             handleGameEnd()
+            setWhiteIsInCheckmate(false)
+        }
+        if (blackIsInCheckmate) {
+            handleGameEnd()
+            setBlackIsInCheckmate(false)
         }
     }, [whiteIsInCheckmate, blackIsInCheckmate])
 
     useEffect(() => {
         if (resetBoard) {
-            setBoard((prev) => [...restartBoard])
+            setBoard((prev) => [...initiateBoard])
         }
+        // handleResetBoard()
     }, [resetBoard])
 
     return (
@@ -1010,27 +1017,6 @@ function GameBoard({ handleGameEnd, resetBoard, restartBoard }) {
                     })
                 }
             </div>
-            {/* <div className='game-state'>
-                <div>It is {playerTurn}'s turn</div>
-                {
-                    whiteIsInCheckmate ?
-                        <p>
-                            "Game over: White has been checkmated"
-                        </p> : false
-                }
-                {
-                    blackIsInCheckmate ?
-                        <p>
-                            "Game over: Black has been checkmated"
-                        </p> : false
-                }
-                {
-                    isItStalemate ?
-                        <p>
-                            "Game over, it's stalemate"
-                        </p> : false
-                }
-            </div> */}
         </div>
     )
 }

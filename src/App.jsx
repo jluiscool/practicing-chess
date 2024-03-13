@@ -71,7 +71,7 @@ function App() {
     isSelected: false,
   };
 
-  const restartBoard = [
+  const initiateBoard = [
     BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, BlackBishop, BlackKnight, BlackRook,
     BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn,
     '', '', '', '', '', '', '', '',
@@ -101,7 +101,7 @@ function App() {
       </header>
       {newGame ? <GameStartModal handleNewGame={handleNewGame} /> : false}
       {gameEnd ? <GameEndModal handleResetBoard={handleResetBoard} handleGameEnd={handleGameEnd} /> : false}
-      <GameBoard handleGameEnd={handleGameEnd} resetBoard={resetBoard} restartBoard={restartBoard} />
+      <GameBoard handleGameEnd={handleGameEnd} resetBoard={resetBoard} initiateBoard={initiateBoard} handleResetBoard={handleResetBoard}/>
       <ScoreBoard />
     </div>
   );
